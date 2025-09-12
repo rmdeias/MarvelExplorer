@@ -37,6 +37,7 @@ class MarvelApiService
      */
     public function getCharacters(int $limit = 10, int $offset = 0): array
     {
+        $data = [];
         $timestamp = time();
         $hash = md5($timestamp . $this->privateKey . $this->publicKey);
         try {
@@ -50,7 +51,17 @@ class MarvelApiService
                 ],
             ]);
 
-            return $response->toArray();
+            foreach ($response->toArray()['data']['results'] as $character) {
+
+                $data[] = [$character['id'],
+                    $character['name'],
+                    $character['description'],
+                    $character['thumbnail'],
+                    $character['comics']['items']];
+            }
+
+            return $data;
+
         } catch (TransportExceptionInterface $e) {
             // Erreur réseau
             throw new \RuntimeException('Connection error:' . $e->getMessage());
