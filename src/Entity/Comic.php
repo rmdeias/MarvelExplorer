@@ -43,6 +43,9 @@ class Comic
     #[ORM\ManyToMany(targetEntity: Character::class, inversedBy: 'comics')]
     private Collection $characters;
 
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $variants = null;
+
     public function __construct()
     {
         $this->characters = new ArrayCollection();
@@ -157,6 +160,18 @@ class Comic
     public function removeCharacter(Character $character): static
     {
         $this->characters->removeElement($character);
+
+        return $this;
+    }
+
+    public function getVariants(): ?array
+    {
+        return $this->variants;
+    }
+
+    public function setVariants(?array $variants): static
+    {
+        $this->variants = $variants;
 
         return $this;
     }
