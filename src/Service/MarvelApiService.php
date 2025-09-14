@@ -131,6 +131,7 @@ class MarvelApiService
             'thumbnail' => "{$c['thumbnail']['path']}.{$c['thumbnail']['extension']}",
             'pageCount' => $c['pageCount'],
             'dates' => $c['dates'],
+            'variants' => $c['variants'],
         ], $results);
 
         return $datas;
