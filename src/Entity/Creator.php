@@ -39,9 +39,16 @@ class Creator
     #[ORM\Column(length: 255)]
     private ?string $role = null;
 
+    /**
+     * @var Collection<int, Serie>
+     */
+    #[ORM\ManyToMany(targetEntity: Serie::class, mappedBy: 'creators')]
+    private Collection $series;
+
     public function __construct()
     {
         $this->comics = new ArrayCollection();
+        $this->series = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -141,6 +148,33 @@ class Creator
     public function setRole(string $role): static
     {
         $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Serie>
+     */
+    public function getSeries(): Collection
+    {
+        return $this->series;
+    }
+
+    public function addSeries(Serie $series): static
+    {
+        if (!$this->series->contains($series)) {
+            $this->series->add($series);
+            $series->addCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSeries(Serie $series): static
+    {
+        if ($this->series->removeElement($series)) {
+            $series->removeCreator($this);
+        }
 
         return $this;
     }
