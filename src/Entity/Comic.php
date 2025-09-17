@@ -52,6 +52,9 @@ class Comic
     #[ORM\ManyToMany(targetEntity: Creator::class, mappedBy: 'comics')]
     private Collection $creators;
 
+    #[ORM\ManyToOne(inversedBy: 'comics')]
+    private ?Serie $serie = null;
+
     public function __construct()
     {
         $this->characters = new ArrayCollection();
@@ -206,6 +209,18 @@ class Comic
         if ($this->creators->removeElement($creator)) {
             $creator->removeComic($this);
         }
+
+        return $this;
+    }
+
+    public function getSerie(): ?Serie
+    {
+        return $this->serie;
+    }
+
+    public function setSerie(?Serie $serie): static
+    {
+        $this->serie = $serie;
 
         return $this;
     }
