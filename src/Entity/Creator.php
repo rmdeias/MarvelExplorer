@@ -30,20 +30,9 @@ class Creator
     #[ORM\Column(length: 255)]
     private ?string $thumbnail = null;
 
-    /**
-     * @var Collection<int, Comic>
-     */
-    #[ORM\ManyToMany(targetEntity: Comic::class, inversedBy: 'creators')]
-    private Collection $comics;
-
     #[ORM\Column(length: 255)]
-    private ?string $role = null;
+    private ?string $fullName = null;
 
-    /**
-     * @var Collection<int, Serie>
-     */
-    #[ORM\ManyToMany(targetEntity: Serie::class, mappedBy: 'creators')]
-    private Collection $series;
 
     public function __construct()
     {
@@ -116,66 +105,16 @@ class Creator
         return $this;
     }
 
-    /**
-     * @return Collection<int, Comic>
-     */
-    public function getComics(): Collection
+    public function getFullName(): ?string
     {
-        return $this->comics;
+        return $this->fullName;
     }
 
-    public function addComic(Comic $comic): static
+    public function setFullName(string $fullName): static
     {
-        if (!$this->comics->contains($comic)) {
-            $this->comics->add($comic);
-        }
+        $this->fullName = $fullName;
 
         return $this;
     }
 
-    public function removeComic(Comic $comic): static
-    {
-        $this->comics->removeElement($comic);
-
-        return $this;
-    }
-
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
-
-    public function setRole(string $role): static
-    {
-        $this->role = $role;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Serie>
-     */
-    public function getSeries(): Collection
-    {
-        return $this->series;
-    }
-
-    public function addSeries(Serie $series): static
-    {
-        if (!$this->series->contains($series)) {
-            $this->series->add($series);
-            $series->addCreator($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSeries(Serie $series): static
-    {
-        if ($this->series->removeElement($series)) {
-            $series->removeCreator($this);
-        }
-
-        return $this;
-    }
 }
