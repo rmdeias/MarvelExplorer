@@ -31,16 +31,16 @@ class AppFixtures extends Fixture
         $stanLee = (new Creator())
             ->setFirstName('Stan')
             ->setLastName('Lee')
+            ->setFullName('Stan Lee')
             ->setMarvelId(2001)
             ->setThumbnail('image')
-            ->setRole('Createur')
             ->setModified('2025-09-17');
         $jackKirby = (new Creator())
             ->setFirstName('Jack')
             ->setLastName('Kirby')
+            ->setFullName('Jack Kirby')
             ->setMarvelId(2002)
             ->setThumbnail('image')
-            ->setRole('Createur')
             ->setModified('2025-09-17');
         $manager->persist($stanLee);
         $manager->persist($jackKirby);
@@ -52,7 +52,6 @@ class AppFixtures extends Fixture
             ->setStartYear('2025-12-12')
             ->setEndYear('2025-12-12')
             ->setThumbnail('image')
-            ->addCreator($jackKirby)
             ->addCharacter($spiderman)
             ->addCharacter($ironMan);
         $manager->persist($spiderSeries);
@@ -63,10 +62,18 @@ class AppFixtures extends Fixture
             ->setMarvelId(4001)
             ->setSerie($spiderSeries)
             ->addCharacter($spiderman)
-            ->addCreator($stanLee)
             ->setThumbnail('image')
             ->setModified('2025-09-17')
-            ->addCreator($jackKirby)
+            ->setCreators([
+                [
+                    'marvelCreatorId' => '887',
+                    'role' => 'writer',
+                ],
+                [
+                    'marvelCreatorId' => '902',
+                    'role' => 'inker',
+                ],
+            ])
             ->addVariant(5001);
         $manager->persist($comic1);
 
