@@ -41,21 +41,17 @@ class Serie
     private Collection $comics;
 
     /**
-     * @var Collection<int, Creator>
-     */
-    #[ORM\ManyToMany(targetEntity: Creator::class, inversedBy: 'series')]
-    private Collection $creators;
-
-    /**
      * @var Collection<int, Character>
      */
     #[ORM\ManyToMany(targetEntity: Character::class, inversedBy: 'series')]
     private Collection $characters;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $creators = null;
+
     public function __construct()
     {
         $this->comics = new ArrayCollection();
-        $this->creators = new ArrayCollection();
         $this->characters = new ArrayCollection();
     }
 
@@ -166,29 +162,6 @@ class Serie
         return $this;
     }
 
-    /**
-     * @return Collection<int, Creator>
-     */
-    public function getCreators(): Collection
-    {
-        return $this->creators;
-    }
-
-    public function addCreator(Creator $creator): static
-    {
-        if (!$this->creators->contains($creator)) {
-            $this->creators->add($creator);
-        }
-
-        return $this;
-    }
-
-    public function removeCreator(Creator $creator): static
-    {
-        $this->creators->removeElement($creator);
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Character>
@@ -210,6 +183,18 @@ class Serie
     public function removeCharacter(Character $character): static
     {
         $this->characters->removeElement($character);
+
+        return $this;
+    }
+
+    public function getCreators(): ?array
+    {
+        return $this->creators;
+    }
+
+    public function setCreators(?array $creators): static
+    {
+        $this->creators = $creators;
 
         return $this;
     }
