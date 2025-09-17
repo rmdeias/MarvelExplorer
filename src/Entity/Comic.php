@@ -46,9 +46,16 @@ class Comic
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private ?array $variants = null;
 
+    /**
+     * @var Collection<int, Creator>
+     */
+    #[ORM\ManyToMany(targetEntity: Creator::class, mappedBy: 'comics')]
+    private Collection $creators;
+
     public function __construct()
     {
         $this->characters = new ArrayCollection();
+        $this->creators = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -172,6 +179,33 @@ class Comic
     public function setVariants(?array $variants): static
     {
         $this->variants = $variants;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Creator>
+     */
+    public function getCreators(): Collection
+    {
+        return $this->creators;
+    }
+
+    public function addCreator(Creator $creator): static
+    {
+        if (!$this->creators->contains($creator)) {
+            $this->creators->add($creator);
+            $creator->addComic($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreator(Creator $creator): static
+    {
+        if ($this->creators->removeElement($creator)) {
+            $creator->removeComic($this);
+        }
 
         return $this;
     }
