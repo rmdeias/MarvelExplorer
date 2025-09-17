@@ -38,9 +38,16 @@ class Character
     #[ORM\ManyToMany(targetEntity: Comic::class, mappedBy: 'characters')]
     private Collection $comics;
 
+    /**
+     * @var Collection<int, Serie>
+     */
+    #[ORM\ManyToMany(targetEntity: Serie::class, mappedBy: 'characters')]
+    private Collection $series;
+
     public function __construct()
     {
         $this->comics = new ArrayCollection();
+        $this->series = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -130,6 +137,33 @@ class Character
     {
         if ($this->comics->removeElement($comic)) {
             $comic->removeCharacter($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Serie>
+     */
+    public function getSeries(): Collection
+    {
+        return $this->series;
+    }
+
+    public function addSeries(Serie $series): static
+    {
+        if (!$this->series->contains($series)) {
+            $this->series->add($series);
+            $series->addCharacter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSeries(Serie $series): static
+    {
+        if ($this->series->removeElement($series)) {
+            $series->removeCharacter($this);
         }
 
         return $this;
