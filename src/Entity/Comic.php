@@ -43,8 +43,9 @@ class Comic
     #[ORM\ManyToMany(targetEntity: Character::class, inversedBy: 'comics')]
     private Collection $characters;
 
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private ?array $variants = null;
+    #[ORM\Column(type: 'json', nullable: true)]
+    private array $variants = [];
+
 
     /**
      * @var Collection<int, Creator>
@@ -183,6 +184,14 @@ class Comic
     {
         $this->variants = $variants;
 
+        return $this;
+    }
+
+    public function addVariant(int $variantId): self
+    {
+        if (!in_array($variantId, $this->variants ?? [], true)) {
+            $this->variants[] = $variantId;
+        }
         return $this;
     }
 
