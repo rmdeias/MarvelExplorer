@@ -99,11 +99,10 @@ class MarvelApiService
         $results = $this->fetchData('characters', $limit, $offset);
 
         $datas = array_map(fn($c) => [
-            'id' => $c['id'],
+            'marvelId' => $c['id'],
             'name' => $c['name'],
             'description' => $c['description'] ?: 'No description available',
             'thumbnail' => "{$c['thumbnail']['path']}.{$c['thumbnail']['extension']}",
-            'comics' => array_column($c['comics']['items'], 'name'),
         ], $results);
 
         return $datas;
@@ -124,14 +123,69 @@ class MarvelApiService
     {
         $results = $this->fetchData('comics', $limit, $offset);
 
+        $datas = array_map(function ($c) {
+            // Extraire l'ID de série
+            $serieId = null;
+            if (!empty($c['series']['resourceURI'])) {
+                preg_match('/\/(\d+)$/', $c['series']['resourceURI'], $matches);
+                $serieId = $matches[1] ?? null;
+            }
+
+            return [
+                'marvelId' => $c['id'],
+                'title' => $c['title'],
+                'description' => $c['description'] ?: 'No description available',
+                'thumbnail' => "{$c['thumbnail']['path']}.{$c['thumbnail']['extension']}",
+                'pageCount' => $c['pageCount'],
+                'dates' => $c['dates'],
+                'variants' => $c['variants'],
+                'creators' => array_map(function ($creator) {
+                    preg_match('/\/(\d+)$/', $creator['resourceURI'], $matches);
+                    return [
+                        'marvelCreatorId' => $matches[1] ?? null,
+                        'role' => $creator['role'],
+                    ];
+                }, $c['creators']['items'] ?? []),
+                'serie_id' => $serieId,
+            ];
+        }, $results);
+
+        return $datas;
+    }
+
+    public function getCreators(int $limit, int $offset): array
+    {
+        $results = $this->fetchData('creators', $limit, $offset);
+
         $datas = array_map(fn($c) => [
-            'id' => $c['id'],
+            'marvelId' => $c['id'],
+            'fullName' => $c['fullName'],
+            'firstName' => $c['firstName'],
+            'lastName' => $c['lastName'],
+            'thumbnail' => "{$c['thumbnail']['path']}.{$c['thumbnail']['extension']}",
+        ], $results);
+
+        return $datas;
+    }
+
+    public function getSeries(int $limit, int $offset): array
+    {
+        $results = $this->fetchData('series', $limit, $offset);
+
+        $datas = array_map(fn($c) => [
+            'marvelId' => $c['id'],
             'title' => $c['title'],
             'description' => $c['description'] ?: 'No description available',
             'thumbnail' => "{$c['thumbnail']['path']}.{$c['thumbnail']['extension']}",
-            'pageCount' => $c['pageCount'],
-            'dates' => $c['dates'],
-            'variants' => $c['variants'],
+            'startYear' => $c['startYear'],
+            'endYear' => $c['endYear'],
+            'creators' => array_map(function ($creator) {
+                preg_match('/\/(\d+)$/', $creator['resourceURI'], $matches);
+                return [
+                    'marvelCreatorId' => $matches[1] ?? null,
+                    'role' => $creator['role'],
+                ];
+            }, $c['creators']['items'] ?? []),
         ], $results);
 
         return $datas;
