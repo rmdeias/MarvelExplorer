@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\CreatorRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: CreatorRepository::class)]
+class Creator
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column]
+    private ?int $marvelId = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $lastName = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $modified = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $thumbnail = null;
+
+    /**
+     * @var Collection<int, Comic>
+     */
+    #[ORM\ManyToMany(targetEntity: Comic::class, inversedBy: 'creators')]
+    private Collection $comics;
+
+    #[ORM\Column(length: 255)]
+    private ?string $role = null;
+
+    public function __construct()
+    {
+        $this->comics = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getMarvelId(): ?int
+    {
+        return $this->marvelId;
+    }
+
+    public function setMarvelId(int $marvelId): static
+    {
+        $this->marvelId = $marvelId;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): static
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getModified(): ?string
+    {
+        return $this->modified;
+    }
+
+    public function setModified(string $modified): static
+    {
+        $this->modified = $modified;
+
+        return $this;
+    }
+
+    public function getThumbnail(): ?string
+    {
+        return $this->thumbnail;
+    }
+
+    public function setThumbnail(string $thumbnail): static
+    {
+        $this->thumbnail = $thumbnail;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comic>
+     */
+    public function getComics(): Collection
+    {
+        return $this->comics;
+    }
+
+    public function addComic(Comic $comic): static
+    {
+        if (!$this->comics->contains($comic)) {
+            $this->comics->add($comic);
+        }
+
+        return $this;
+    }
+
+    public function removeComic(Comic $comic): static
+    {
+        $this->comics->removeElement($comic);
+
+        return $this;
+    }
+
+    public function getRole(): ?string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): static
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+}
