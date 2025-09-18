@@ -53,6 +53,9 @@ class Comic
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $creators = null;
 
+    #[ORM\Column]
+    private ?int $marvelIdSerie = null;
+
     public function __construct()
     {
         $this->characters = new ArrayCollection();
@@ -212,6 +215,18 @@ class Comic
     public function setCreators(?array $creators): static
     {
         $this->creators = $creators;
+
+        return $this;
+    }
+
+    public function getMarvelIdSerie(): ?int
+    {
+        return $this->marvelIdSerie;
+    }
+
+    public function setMarvelIdSerie(int $marvelIdSerie): static
+    {
+        $this->marvelIdSerie = $marvelIdSerie;
 
         return $this;
     }
