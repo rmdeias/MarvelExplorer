@@ -166,7 +166,7 @@ class MarvelApiService
                         'role' => $creator['role'],
                     ];
                 }, $c['creators']['items'] ?? []),
-                'serie_id' => $serieId,
+                'marvelIdSerie' => $serieId,
             ];
         }, $results);
     }
