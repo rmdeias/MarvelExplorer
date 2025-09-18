@@ -92,6 +92,21 @@ class MarvelApiService
     }
 
     /**
+     * Extract marvelId from resourceURI.
+     *
+     * @param string $uri The Marvel resource URI.
+     * @return int||null The extracted Marvel ID, or null if not found.
+     */
+    private function catchIdWithURI(string $uri): ?int
+    {
+        if (!empty($uri)) {
+            preg_match('/\/(\d+)$/', $uri, $matches);
+            return (int)$matches[1] ?? null;
+        }
+        return null;
+    }
+
+    /**
      * Retrieves a list of Marvel characters.
      *
      * @param int $limit Number of characters to fetch (max 100).
@@ -142,11 +157,7 @@ class MarvelApiService
         $results = $this->fetchData('comics', $limit, $offset, $modifiedSince);
 
         return array_map(function ($c) {
-            $serieId = null;
-            if (!empty($c['series']['resourceURI'])) {
-                preg_match('/\/(\d+)$/', $c['series']['resourceURI'], $matches);
-                $serieId = $matches[1] ?? null;
-            }
+            $serieId = $this->catchIdWithURI($c['series']['resourceURI']);
 
             return [
                 'marvelId' => $c['id'],
@@ -160,13 +171,17 @@ class MarvelApiService
                 })($c['dates']),
                 'variants' => $c['variants'],
                 'creators' => array_map(function ($creator) {
-                    preg_match('/\/(\d+)$/', $creator['resourceURI'], $matches);
+                    $marvelCreatorId = $this->catchIdWithURI($creator['resourceURI']);
                     return [
-                        'marvelCreatorId' => $matches[1] ?? null,
+                        'marvelCreatorId' => $marvelCreatorId,
                         'role' => $creator['role'],
                     ];
                 }, $c['creators']['items'] ?? []),
                 'marvelIdSerie' => $serieId,
+                'marvelIdsCharacter' => array_map(function ($character) {
+                    return $this->catchIdWithURI($character['resourceURI']);
+
+                }, $c['characters']['items'] ?? [])
             ];
         }, $results);
     }
@@ -241,12 +256,15 @@ class MarvelApiService
             'startYear' => $c['startYear'],
             'endYear' => $c['endYear'],
             'creators' => array_map(function ($creator) {
-                preg_match('/\/(\d+)$/', $creator['resourceURI'], $matches);
+                $marvelCreatorId = $this->catchIdWithURI($creator['resourceURI']);
                 return [
-                    'marvelCreatorId' => $matches[1] ?? null,
+                    'marvelCreatorId' => $marvelCreatorId,
                     'role' => $creator['role'],
                 ];
             }, $c['creators']['items'] ?? []),
+            'marvelIdsCharacter' => array_map(function ($character) {
+                return $this->catchIdWithURI($character['resourceURI']);
+            }, $c['characters']['items'] ?? [])
         ], $results);
     }
 }
