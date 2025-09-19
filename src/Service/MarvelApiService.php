@@ -120,7 +120,7 @@ class MarvelApiService
      * $recentSeries = $this->fetchAll('series', 100, '2024-01-01');
      */
 
-    private function fetchAll(string $endpoint, int $limit = 100, ?string $modifiedSince = null): array
+    private function fetchAll(string $endpoint, int $limit, ?string $modifiedSince = null): array
     {
         $allResults = [];
         $offset = 0;
@@ -152,7 +152,7 @@ class MarvelApiService
     /**
      * Retrieves a list of Marvel characters.
      *
-     * @param int|null $limit Maximum number of items per request (Marvel max is 100, default 100).
+     * @param int $limit Maximum number of items per request (Marvel max is 100, default 100).
      * @param string|null $modifiedSince Last updated date (optional).
      *
      * @return array<int, array{marvelId:int, name:string, description:string, thumbnail:string}>
@@ -160,7 +160,7 @@ class MarvelApiService
      * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface|
      *         RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
      */
-    public function getCharacters(int $limit = null, ?string $modifiedSince = null): array
+    public function getCharacters(int $limit = 100, ?string $modifiedSince = null): array
     {
         $results = $this->fetchAll('characters', $limit, $modifiedSince);
         return array_map(fn($c) => [
@@ -174,7 +174,7 @@ class MarvelApiService
     /**
      * Retrieves a list of Marvel comics.
      *
-     * @param int|null $limit Maximum number of items per request (Marvel max is 100, default 100).
+     * @param int $limit Maximum number of items per request (Marvel max is 100, default 100).
      * @param string|null $modifiedSince Last updated date (optional).
      *
      * @return array<int, array{
@@ -193,7 +193,7 @@ class MarvelApiService
      * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface|
      *         RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
      */
-    public function getComics(int $limit = null, ?string $modifiedSince = null): array
+    public function getComics(int $limit = 100, ?string $modifiedSince = null): array
     {
         $results = $this->fetchAll('comics', $limit, $modifiedSince);
 
@@ -236,7 +236,7 @@ class MarvelApiService
     /**
      * Retrieves a list of Marvel creators.
      *
-     * @param int|null $limit Maximum number of items per request (Marvel max is 100, default 100).
+     * @param int $limit  Maximum number of items per request (Marvel max is 100, default 100).
      * @param string|null $modifiedSince Last updated date (optional).
      *
      * @return array<int, array{
@@ -250,7 +250,7 @@ class MarvelApiService
      * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface|
      *         RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
      */
-    public function getCreators(int $limit = null, ?string $modifiedSince = null): array
+    public function getCreators(int $limit = 100, ?string $modifiedSince = null): array
     {
         $results = $this->fetchAll('creators', $limit, $modifiedSince);
 
@@ -273,7 +273,7 @@ class MarvelApiService
     /**
      * Retrieves a list of Marvel series.
      *
-     * @param int|null $limit Maximum number of items per request (Marvel max is 100, default 100).
+     * @param int $limit Maximum number of items per request (Marvel max is 100, default 100).
      * @param string|null $modifiedSince Last updated date (optional).
      *
      * @return array<int, array{
@@ -291,7 +291,7 @@ class MarvelApiService
      * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface|
      *         RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
      */
-    public function getSeries(int $limit = null, ?string $modifiedSince = null): array
+    public function getSeries(int $limit = 100, ?string $modifiedSince = null): array
     {
         $results = $this->fetchAll('series', $limit, $modifiedSince);
 
