@@ -23,3 +23,7 @@ services:
         arguments:
             $publicKey: '%env(MARVEL_PUBLIC_KEY)%'
             $privateKey: '%env(MARVEL_PRIVATE_KEY)%'
+
+    App\DataFixtures\:
+        resource: '../src/DataFixtures'
+        tags: [ 'doctrine.fixture.orm' ]
