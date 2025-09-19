@@ -9,7 +9,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CharacterRepository::class)]
-#[ORM\Table(name: '`character`')]
+#[ORM\Table(name: '`character`', indexes: [
+    new ORM\Index(name: 'idx_marvel_id', columns: ['marvelId'])
+])]
 class Character
 {
     #[ORM\Id]
@@ -17,7 +19,7 @@ class Character
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(unique: true)]
     private ?int $marvelId = null;
 
     #[ORM\Column(length: 255)]

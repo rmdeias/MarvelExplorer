@@ -8,6 +8,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CreatorRepository::class)]
+#[ORM\Table(name: '`creator`', indexes: [
+    new ORM\Index(name: 'idx_marvel_id', columns: ['marvelId'])
+])]
 class Creator
 {
     #[ORM\Id]
@@ -15,7 +18,7 @@ class Creator
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(unique: true)]
     private ?int $marvelId = null;
 
     #[ORM\Column(length: 255)]
