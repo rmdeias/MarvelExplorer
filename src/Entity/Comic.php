@@ -56,10 +56,10 @@ class Comic
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $creators = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $marvelIdSerie = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'json', nullable: true)]
     private array $marvelIdsCharacter = [];
 
     public function __construct()
