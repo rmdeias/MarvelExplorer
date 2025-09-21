@@ -8,7 +8,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class CharacterFixtures extends Fixture implements FixtureGroupInterface
+class CharactersFixtures extends Fixture implements FixtureGroupInterface
 {
     public static function getGroups(): array
     {
@@ -24,39 +24,44 @@ class CharacterFixtures extends Fixture implements FixtureGroupInterface
     {
         $limit = 100;      // max Marvel API
         $offset = 0;
-        $batchSize = 50;   // flush tous les 50 characters
         $moreData = true;
 
+        echo "--- start of import ---\n";
+
         while ($moreData) {
-            // récupère un batch
-            $charactersData = $this->marvelApi->getCharacters($limit, null, $offset);
+            try {
+                $charactersData = $this->marvelApi->getCharacters($limit, $offset);
+                $count = count($charactersData);
+                echo "Batch offset $offset : $count characters\n";
 
-            foreach ($charactersData as $i => $c) {
-                // évite les doublons
-                $existing = $manager->getRepository(Character::class)
-                    ->findOneBy(['marvelId' => $c['marvelId']]);
+                foreach ($charactersData as $i => $c) {
+                    // évite les doublons
+                    $existing = $manager->getRepository(Character::class)
+                        ->findOneBy(['marvelId' => $c['marvelId']]);
+                    if ($existing) continue;
 
-                if (!$existing) {
                     $character = new Character();
                     $character->setMarvelId($c['marvelId']);
                     $character->setName($c['name']);
                     $character->setDescription($c['description']);
                     $character->setThumbnail($c['thumbnail']);
                     $manager->persist($character);
+
                 }
 
-                // flush/clear par batch
-                if (($i + 1) % $batchSize === 0) {
-                    $manager->flush();
-                    $manager->clear();
-                }
+                $manager->flush();
+                $manager->clear();
+
+                $offset += $limit;
+                $moreData = count($charactersData) === $limit;
+                sleep(1);
+
+            } catch (\Throwable $e) {
+                echo "Erreur : " . $e->getMessage() . "\n";
+                break;
             }
-
-            $manager->flush();
-            $manager->clear();
-
-            $offset += $limit;
-            $moreData = count($charactersData) === $limit; // continue tant qu’on a un batch complet
         }
+
+        echo "--- Import completed ---\n";
     }
 }
