@@ -1,5 +1,4 @@
 <?php
-// src/DataFixtures/ComicsFixtures.php
 
 namespace App\DataFixtures;
 
@@ -10,34 +9,33 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Psr\Log\LoggerInterface;
 
-class ComicFixtures extends Fixture implements FixtureGroupInterface
+class ComicsFixtures extends Fixture implements FixtureGroupInterface
 {
     public static function getGroups(): array
     {
-        return ['comic'];
+        return ['comics'];
     }
 
-    private LoggerInterface $logger;
 
-    public function __construct(private MarvelApiService $marvelApi, LoggerInterface $logger)
+    public function __construct(private MarvelApiService $marvelApi)
     {
-        $this->logger = $logger;
     }
 
+    /** commande : php bin/console doctrine:fixtures:load --append --group=comics **/
     public function load(ObjectManager $manager): void
     {
         $offset = 0;
         $limit = 50;
         $moreData = true;
 
-        $this->logger->info('--- Début import des comics Marvel ---');
+        echo "--- start of import ---\n";
 
         while ($moreData) {
             try {
                 $comics = $this->marvelApi->getComics($limit, null, $offset);
                 $count = count($comics);
 
-                echo "Batch offset $offset : $count comics récupérés\n";
+                echo "Batch offset $offset : $count comics\n";
 
                 if ($count === 0) break;
 
@@ -62,12 +60,11 @@ class ComicFixtures extends Fixture implements FixtureGroupInterface
                     $manager->persist($comicEntity);
                 }
 
-                // Flush complet pour le batch
                 $manager->flush();
-                $manager->clear(); // clear après flush complet seulement
+                $manager->clear();
 
                 $offset += $limit;
-                $moreData = $count === $limit; // continue si batch complet
+                $moreData = $count === $limit;
                 sleep(1);
 
             } catch (\Throwable $e) {
@@ -76,6 +73,6 @@ class ComicFixtures extends Fixture implements FixtureGroupInterface
             }
         }
 
-        echo "--- Import terminé ---\n";
+        echo "--- Import completed ---\n";
     }
 }
