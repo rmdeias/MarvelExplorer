@@ -1,4 +1,5 @@
 <?php
+// src/DataFixtures/ComicsFixtures.php
 
 namespace App\DataFixtures;
 
@@ -7,39 +8,74 @@ use App\Service\MarvelApiService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
+use Psr\Log\LoggerInterface;
 
-class ComicsFixtures extends Fixture implements FixtureGroupInterface
+class ComicFixtures extends Fixture implements FixtureGroupInterface
 {
     public static function getGroups(): array
     {
-        return ['comics'];
+        return ['comic'];
     }
 
-    public function __construct(private MarvelApiService $marvelApi)
+    private LoggerInterface $logger;
+
+    public function __construct(private MarvelApiService $marvelApi, LoggerInterface $logger)
     {
+        $this->logger = $logger;
     }
 
     public function load(ObjectManager $manager): void
     {
+        $offset = 0;
+        $limit = 50;
+        $moreData = true;
 
-        $comicsData = $this->marvelApi->getComics();
+        $this->logger->info('--- Début import des comics Marvel ---');
 
-        foreach ($comicsData as $c) {
-            $comics = new Comic();
-            $comics->setMarvelId($c['marvelId']);
-            $comics->setTitle($c['title']);
-            $comics->setDescription($c['description']);
-            $comics->setThumbnail($c['thumbnail']);
-            $comics->setThumbnail($c['dates']);
-            $comics->setThumbnail($c['variants']);
-            $comics->setThumbnail($c['pageCount']);
-            $comics->setThumbnail($c['creators']);
-            $comics->setThumbnail($c['marvelIdSerie']);
-            $comics->setThumbnail($c['marvelIdsCharacter']);
-            $manager->persist($comics);
+        while ($moreData) {
+            try {
+                $comics = $this->marvelApi->getComics($limit, null, $offset);
+                $count = count($comics);
+
+                echo "Batch offset $offset : $count comics récupérés\n";
+
+                if ($count === 0) break;
+
+                foreach ($comics as $comic) {
+                    $existing = $manager->getRepository(Comic::class)
+                        ->findOneBy(['marvelId' => $comic['marvelId']]);
+
+                    if ($existing) continue;
+
+                    $comicEntity = new Comic();
+                    $comicEntity->setMarvelId($comic['marvelId']);
+                    $comicEntity->setTitle($comic['title']);
+                    $comicEntity->setDescription($comic['description'] ?? '');
+                    $comicEntity->setPageCount($comic['pageCount'] ?? 0);
+                    $comicEntity->setThumbnail($comic['thumbnail'] ?? null);
+                    $comicEntity->setDate($comic['dates'] ?? null);
+                    $comicEntity->setVariants($comic['variants'] ?? []);
+                    $comicEntity->setCreators($comic['creators'] ?? []);
+                    $comicEntity->setMarvelIdSerie($comic['marvelIdSerie'] ?? 0);
+                    $comicEntity->setMarvelIdsCharacter($comic['marvelIdsCharacter'] ?? []);
+
+                    $manager->persist($comicEntity);
+                }
+
+                // Flush complet pour le batch
+                $manager->flush();
+                $manager->clear(); // clear après flush complet seulement
+
+                $offset += $limit;
+                $moreData = $count === $limit; // continue si batch complet
+                sleep(1);
+
+            } catch (\Throwable $e) {
+                echo "Erreur : " . $e->getMessage() . "\n";
+                break;
+            }
         }
 
-        $manager->flush();
+        echo "--- Import terminé ---\n";
     }
 }
-
