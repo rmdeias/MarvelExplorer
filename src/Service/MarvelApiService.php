@@ -52,25 +52,23 @@ class MarvelApiService
     }
 
     /**
-     * Performs a GET request to a Marvel API endpoint and returns the results.
+     * Executes a GET request to the Marvel API and returns decoded results.
      *
-     * @param string $endpoint API endpoint (e.g., "characters", "comics").
-     * @param int $limit Maximum number of results (Marvel max is 100).
+     * @param string $endpoint The API endpoint (e.g. "characters", "comics").
+     * @param int $limit Maximum number of results (Marvel max: 100).
      * @param int $offset Offset for pagination.
-     * @param string|null $modifiedSince Last updated date (optional).
-     * @param string|null $order Order by.
-     * @param string|null $nameStartsWith One Letter.
+     * @param string|null $modifiedSince Optional: fetch only items modified since this date.
      *
-     * @return array Decoded results from the API.
+     * @return array The decoded API results.
      *
-     * @throws TransportExceptionInterface On network errors.
-     * @throws ClientExceptionInterface On client (4xx) errors.
+     * @throws TransportExceptionInterface   On network errors.
+     * @throws ClientExceptionInterface      On client (4xx) errors.
      * @throws RedirectionExceptionInterface On redirection errors.
-     * @throws ServerExceptionInterface On server (5xx) errors.
-     * @throws DecodingExceptionInterface On JSON decoding errors.
-     * @throws \RuntimeException If the HTTP response code is not 200.
+     * @throws ServerExceptionInterface      On server (5xx) errors.
+     * @throws DecodingExceptionInterface    On JSON decoding errors.
+     * @throws \RuntimeException             If the HTTP status code is not 200.
      */
-    private function fetchData(string $endpoint, int $limit, int $offset, ?string $modifiedSince = null, ?string $order = null, ?string $nameStartsWith = null): array
+    private function fetchData(string $endpoint, int $limit, int $offset, ?string $modifiedSince = null): array
     {
         $params = array_merge([
             'limit' => $limit,
@@ -80,12 +78,6 @@ class MarvelApiService
         // Add param only if not null
         if ($modifiedSince !== null) {
             $params['modifiedSince'] = $modifiedSince;
-        }
-        if ($order !== null) {
-            $params['orderBy'] = $order;
-        }
-        if ($nameStartsWith !== null) {
-            $params['nameStartsWith'] = $nameStartsWith;
         }
 
         $response = $this->client->request('GET', "{$this->baseUrl}/{$endpoint}", [
@@ -101,11 +93,11 @@ class MarvelApiService
 
 
     /**
-     * Extract marvelId from resourceURI.
+     * Extracts the Marvel ID from a resource URI.
      *
      * @param string $uri The Marvel resource URI.
      *
-     * @return int|null The extracted Marvel ID, or null if not found.
+     * @return int|null The extracted Marvel ID, or null if none found.
      */
     private function catchIdWithURI(string $uri): ?int
     {
@@ -117,15 +109,21 @@ class MarvelApiService
     }
 
     /**
-     * Retrieves a list of Marvel characters.
+     * Retrieves Marvel characters.
      *
-     * @param int $limit Maximum number of items per request (Marvel max is 100, default 100).
+     * @param int $limit Maximum items per request (Marvel max: 100, default: 100).
      * @param int $offset Offset for pagination.
-     * @param string|null $modifiedSince Last updated date (optional).
+     * @param string|null $modifiedSince Optional: fetch only items modified since this date.
      *
-     * @return array<int, array{marvelId:int, name:string, description:string, thumbnail:string}>
+     * @return array<int, array{
+     *     marvelId:int,
+     *     name:string,
+     *     description:string,
+     *     thumbnail:string
+     * }>
      *
-     * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
+     * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface
+     *         |RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
      */
     public function getCharacters(int $limit = 100, int $offset = 0, ?string $modifiedSince = null): array
     {
@@ -139,11 +137,11 @@ class MarvelApiService
     }
 
     /**
-     * Retrieves a list of Marvel comics.
+     * Retrieves Marvel comics.
      *
-     * @param int $limit Maximum number of items per request (Marvel max is 100, default 100).
+     * @param int $limit Maximum items per request (Marvel max: 100, default: 100).
      * @param int $offset Offset for pagination.
-     * @param string|null $modifiedSince Last updated date (optional).
+     * @param string|null $modifiedSince Optional: fetch only items modified since this date.
      *
      * @return array<int, array{
      *     marvelId:int,
@@ -152,13 +150,14 @@ class MarvelApiService
      *     thumbnail:string,
      *     pageCount:int,
      *     dates:string|null,
-     *     variants:array{int|null},
-     *     creators:array<int,array{marvelCreatorId:int|null, role:string}>,
+     *     variants:array<int|null>,
+     *     creators:array<int, array{marvelCreatorId:int|null, role:string}>,
      *     marvelIdSerie:int,
-     *     marvelIdsCharacter: array{int|null}
+     *     marvelIdsCharacter:array<int|null>
      * }>
      *
-     * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
+     * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface
+     *         |RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
      */
     public function getComics(int $limit = 100, int $offset = 0, ?string $modifiedSince = null): array
     {
@@ -198,12 +197,13 @@ class MarvelApiService
         }, $results);
     }
 
+
     /**
-     * Retrieves a list of Marvel creators.
+     * Retrieves Marvel creators.
      *
-     * @param int $limit Maximum number of items per request (Marvel max is 100, default 100).
+     * @param int $limit Maximum items per request (Marvel max: 100, default: 100).
      * @param int $offset Offset for pagination.
-     * @param string|null $modifiedSince Last updated date (optional).
+     * @param string|null $modifiedSince Optional: fetch only items modified since this date.
      *
      * @return array<int, array{
      *     marvelId:int,
@@ -213,7 +213,8 @@ class MarvelApiService
      *     thumbnail:string
      * }>
      *
-     * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
+     * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface
+     *         |RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
      */
     public function getCreators(int $limit = 100, int $offset = 0, ?string $modifiedSince = null): array
     {
@@ -238,11 +239,11 @@ class MarvelApiService
     }
 
     /**
-     * Retrieves a list of Marvel series.
+     * Retrieves Marvel series.
      *
-     * @param int $limit Maximum number of items per request (Marvel max is 100, default 100).
+     * @param int $limit Maximum items per request (Marvel max: 100, default: 100).
      * @param int $offset Offset for pagination.
-     * @param string|null $modifiedSince Last updated date (optional).
+     * @param string|null $modifiedSince Optional: fetch only items modified since this date.
      *
      * @return array<int, array{
      *     marvelId:int,
@@ -251,12 +252,12 @@ class MarvelApiService
      *     thumbnail:string,
      *     startYear:int,
      *     endYear:int,
-     *     creators:array<int,array{marvelCreatorId:int|null, role:string}>,
-     *     marvelIdSerie:int,
-     *     marvelIdsCharacter: array{int|null}
+     *     creators:array<int, array{marvelCreatorId:int|null, role:string}>,
+     *     marvelIdsCharacter:array<int|null>
      * }>
      *
-     * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
+     * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface
+     *         |RedirectionExceptionInterface|DecodingExceptionInterface|\RuntimeException
      */
     public function getSeries(int $limit = 100, int $offset = 0, ?string $modifiedSince = null): array
     {
