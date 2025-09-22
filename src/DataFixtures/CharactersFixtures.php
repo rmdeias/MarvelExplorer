@@ -8,18 +8,31 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 
+/**
+ * This fixture insert datas in character table from Marvel Api
+ *
+ * Usage:
+ *  php bin/console doctrine:fixtures:load --append --group=characters
+ */
 class CharactersFixtures extends Fixture implements FixtureGroupInterface
 {
+    /**
+     * Defines the fixture group to run this fixture independently.
+     *
+     * @return string[]
+     */
     public static function getGroups(): array
     {
         return ['characters'];
     }
 
+    /**
+     * @param MarvelApiService $marvelApi
+     */
     public function __construct(private MarvelApiService $marvelApi)
     {
     }
 
-    /***** commande : php bin/console doctrine:fixtures:load --append --group=characters **/
     public function load(ObjectManager $manager): void
     {
         $limit = 100;      // max Marvel API
