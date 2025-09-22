@@ -8,19 +8,31 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 
-
+/**
+ * This fixture insert datas in creator table from Marvel Api
+ *
+ * Usage:
+ *  php bin/console doctrine:fixtures:load --append --group=creators
+ */
 class CreatorsFixtures extends Fixture implements FixtureGroupInterface
 {
+    /**
+     * Defines the fixture group to run this fixture independently.
+     *
+     * @return string[]
+     */
     public static function getGroups(): array
     {
         return ['creators'];
     }
 
+    /**
+     * @param MarvelApiService $marvelApi
+     */
     public function __construct(private MarvelApiService $marvelApi)
     {
     }
 
-    /** commande : php bin/console doctrine:fixtures:load --append --group=creators **/
     public function load(ObjectManager $manager): void
     {
         $offset = 0;

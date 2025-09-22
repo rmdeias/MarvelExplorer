@@ -7,21 +7,32 @@ use App\Service\MarvelApiService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
-use Psr\Log\LoggerInterface;
 
+/**
+ * This fixture insert datas in comic table from Marvel Api
+ *
+ * Usage:
+ *  php bin/console doctrine:fixtures:load --append --group=comics
+ */
 class ComicsFixtures extends Fixture implements FixtureGroupInterface
 {
+    /**
+     * Defines the fixture group to run this fixture independently.
+     *
+     * @return string[]
+     */
     public static function getGroups(): array
     {
         return ['comics'];
     }
 
-
+    /**
+     * @param MarvelApiService $marvelApi
+     */
     public function __construct(private MarvelApiService $marvelApi)
     {
     }
 
-    /** commande : php bin/console doctrine:fixtures:load --append --group=comics **/
     public function load(ObjectManager $manager): void
     {
         $offset = 0;

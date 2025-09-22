@@ -8,18 +8,31 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 
+/**
+ * This fixture insert datas in serie table from Marvel Api
+ *
+ * Usage:
+ *  php bin/console doctrine:fixtures:load --append --group=series
+ */
 class SeriesFixtures extends Fixture implements FixtureGroupInterface
 {
+    /**
+     * Defines the fixture group to run this fixture independently.
+     *
+     * @return string[]
+     */
     public static function getGroups(): array
     {
         return ['series'];
     }
 
+    /**
+     * @param MarvelApiService $marvelApi
+     */
     public function __construct(private MarvelApiService $marvelApi)
     {
     }
 
-    /***** commande : php bin/console doctrine:fixtures:load --append --group=series **/
     public function load(ObjectManager $manager): void
     {
         $offset = 0;
