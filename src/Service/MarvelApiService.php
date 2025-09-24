@@ -165,6 +165,10 @@ class MarvelApiService
 
         return array_map(function ($c) {
 
+            if(strpos($c['thumbnail']['path'], 'image_not_available')) {
+                $c['thumbnail']['path'] = '';
+                $c['thumbnail']['extension'] = '';
+            }
             return [
                 'marvelId' => $c['id'] ?? null,
                 'title' => $c['title'] ?? 'Untitled',
