@@ -2,42 +2,54 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CharacterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CharacterRepository::class)]
 #[ORM\Table(name: '`character`', indexes: [
     new ORM\Index(name: 'idx_marvel_id', columns: ['marvelId'])
 ])]
+#[ApiResource(
+    normalizationContext: ['groups' => ['character:read']],
+)]
 class Character
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['comic:read', 'character:read'])]
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
+    #[Groups(['comic:read', 'character:read'])]
     private ?int $marvelId = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['comic:read', 'character:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['comic:read', 'character:read'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['comic:read', 'character:read'])]
     private ?string $modified = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['comic:read', 'character:read'])]
     private ?string $thumbnail = null;
 
     /**
      * @var Collection<int, Comic>
      */
     #[ORM\ManyToMany(targetEntity: Comic::class, mappedBy: 'characters')]
+    #[Groups(['character:read'])]
     private Collection $comics;
 
     /**

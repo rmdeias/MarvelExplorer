@@ -2,6 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use App\DataProvider\ComicDataProvider;
+use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\ComicRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,54 +19,92 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: '`comic`', indexes: [
     new ORM\Index(name: 'idx_marvel_id', columns: ['marvelId'])
 ])]
+#[ApiResource(
+    normalizationContext: ['groups' => ['comic:read']],
+    denormalizationContext: ['groups' => ['comic:write']],
+    operations: [
+        new GetCollection(
+            name: 'default',
+            uriTemplate: '/comics'
+        ),
+        new GetCollection(
+            name: 'searchComicsByTitle',
+            uriTemplate: '/searchComicsByTitle',
+            provider: ComicDataProvider::class,
+            paginationEnabled: false
+        ),
+        new GetCollection(
+            name: 'topRecentComics',
+            uriTemplate: '/topRecentComics',
+            provider: ComicDataProvider::class
+        ),
+    ],
+)]
+#[ApiFilter(SearchFilter::class, properties: ['title' => 'partial'])]
+#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'title' => 'ASC'])]
 class Comic
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['comic:read'])]
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
+    #[Groups(['comic:read'])]
     private ?int $marvelId = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['comic:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['comic:read'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['comic:read'])]
     private ?string $pageCount = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['comic:read'])]
     private ?string $modified = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['comic:read'])]
     private ?string $thumbnail = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $date = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(['comic:read'])]
+    private ?\DateTimeInterface $date = null;
+
 
     /**
      * @var Collection<int, Character>
      */
     #[ORM\ManyToMany(targetEntity: Character::class, inversedBy: 'comics')]
+    #[Groups(['comic:read'])]
     private Collection $characters;
 
     #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['comic:read'])]
     private array $variants = [];
 
 
     #[ORM\ManyToOne(inversedBy: 'comics')]
+    #[Groups(['comic:read'])]
     private ?Serie $serie = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['comic:read'])]
     private ?array $creators = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['comic:read'])]
     private ?int $marvelIdSerie = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['comic:read'])]
     private array $marvelIdsCharacter = [];
 
     public function __construct()
@@ -134,7 +179,7 @@ class Comic
 
     public function getThumbnail(): ?string
     {
-        return $this->thumbnail;
+        return $this->thumbnail ?: '/assets/images/comic-no-img.jpg';
     }
 
     public function setThumbnail(?string $thumbnail): static
@@ -144,21 +189,28 @@ class Comic
         return $this;
     }
 
-    public function getDate(): ?string
+    public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(?string $date): static
+    #[Groups(['comic:read'])]
+    public function getDateFormatted(): ?string
+    {
+        return $this->date?->format('Y-m-d');
+    }
+
+
+    public function setDate(?\DateTimeInterface $date): static
     {
         $this->date = $date;
-
         return $this;
     }
 
     /**
      * @return Collection<int, Character>
      */
+
     public function getCharacters(): Collection
     {
         return $this->characters;
