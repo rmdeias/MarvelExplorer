@@ -1,25 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ComicsController!{% endblock %}
-
 {% block body %}
-
-    <h1>Comics</h1>
-
     <input type="text" id="search-bar" placeholder="Rechercher un comic..."/>
 
     <div class="comic-list" id="comic-list">
-        {% for comic in comics %}
-            <div class="comic-card">
-                <img src="{{ comic.thumbnail }}" alt="{{ comic.title }}">
-                <h3>{{ comic.title }}</h3>
-                <p>{{ comic.date ? comic.date : 'Pas de date' }}</p>
-            </div>
-        {% else %}
-            <p>Aucun comic trouvé.</p>
-        {% endfor %}
+        {% include 'comics/_list.html.twig' with { comics: comics } %}
     </div>
-
     <script>
         const searchInput = document.getElementById('search-bar');
         const comicList = document.getElementById('comic-list');
@@ -27,33 +13,22 @@
         searchInput.addEventListener('input', function () {
             const query = searchInput.value.trim();
 
-            fetch(`/api/comics?search=${encodeURIComponent(query)}&limit=20&sort=alpha`)
-                .then(response => response.json())
-                .then(data => {
-                    comicList.innerHTML = '';
+            if (query === '') {
+                // Revenir à la liste initiale sans faire de fetch
+                comicList.innerHTML = `{% include 'comics/_list.html.twig' with { comics: comics } %}`;
+                return;
+            }
 
-                    if (data.data.length === 0) {
-                        comicList.innerHTML = '<p>Aucun comic trouvé.</p>';
-                        return;
-                    }
-
-                    data.data.forEach(comic => {
-                        const card = document.createElement('div');
-                        card.className = 'comic-card';
-                        card.innerHTML = `
-                    <img src="${comic.thumbnail}" alt="${comic.title}">
-                    <h3>${comic.title}</h3>
-                    <p>${comic.date ? comic.date : 'Pas de date'}</p>
-                `;
-                        comicList.appendChild(card);
-                    });
+            fetch(`/comics/search?title=${encodeURIComponent(query)}`)
+                .then(res => res.text())
+                .then(html => {
+                    comicList.innerHTML = html;
                 })
                 .catch(err => {
-                    console.error('Erreur API:', err);
+                    console.error(err);
                     comicList.innerHTML = '<p>Erreur lors de la récupération des comics.</p>';
                 });
         });
     </script>
-
 
 {% endblock %}
