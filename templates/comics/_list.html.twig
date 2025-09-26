@@ -2,7 +2,7 @@
     <div class="comic-card">
         <img src="{{ comic.thumbnail ?: asset('assets/images/comic-no-img.jpg') }}" alt="{{ comic.title }}">
         <h3>{{ comic.title }}</h3>
-        <p>{{ comic.dateFormatted ?: 'Pas de date' }}</p>
+        <p>{{ comic.date|date("Y-m-d") ?: 'unknown date' }}</p>
     </div>
 {% else %}
     <p>Aucun comic trouvé.</p>

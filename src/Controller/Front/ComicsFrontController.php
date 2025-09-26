@@ -6,20 +6,57 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-
+/**
+ * Class ComicsFrontController
+ *
+ * Controller responsible for handling frontend comic pages.
+ *
+ * This controller provides:
+ * - Listing of recent comics (top comics)
+ * - Searching comics by title
+ *
+ * It communicates with the internal API using HttpClientInterface
+ * to fetch comic data and passes it to Twig templates for rendering.
+ *
+ * All API requests may throw HttpClient exceptions.
+ */
 final class ComicsFrontController extends AbstractController
 {
-    public function __construct(private HttpClientInterface $client)
+    /**
+     * ComicsFrontController constructor.
+     *
+     * @param HttpClientInterface $client Http client used to call internal API endpoints
+     */
+    public function __construct(private readonly HttpClientInterface $client)
     {
     }
 
+    /**
+     * Displays the list of top recent comics.
+     *
+     * Calls the internal API endpoint '/api/topRecentComics' and passes
+     * the result to the 'comics/index.html.twig' template.
+     *
+     * @param Request $request HTTP request object
+     * @return Response Rendered HTML response with top comics
+     *
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     #[Route('/comics', name: 'front_comics')]
     public function index(Request $request): Response
     {
-        // Appel API pour le top récents
-        $baseUrl = $request->getSchemeAndHttpHost(); // http://127.0.0.1:8000
+        $baseUrl = $request->getSchemeAndHttpHost();
         $response = $this->client->request('GET', $baseUrl . '/api/topRecentComics');
 
         $topComics = $response->toArray();
@@ -27,9 +64,25 @@ final class ComicsFrontController extends AbstractController
         return $this->render('comics/index.html.twig', [
             'comics' => $topComics['member'],
         ]);
-
     }
 
+    /**
+     * Searches for comics by title.
+     *
+     * Reads the 'title' query parameter from the request, calls the internal API
+     * endpoint '/api/searchComicsByTitle', and renders the results in the
+     * 'comics/_list.html.twig' template.
+     * If the title is empty, redirects to the main comics page.
+     *
+     * @param Request $request HTTP request object
+     * @return Response Rendered HTML response with search results
+     *
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     #[Route('/comics/search', name: 'front_comics_search', methods: ['GET'])]
     public function search(Request $request): Response
     {
@@ -38,8 +91,7 @@ final class ComicsFrontController extends AbstractController
             return $this->redirectToRoute('front_comics');
         }
 
-        // Appel API pour la recherche
-        $baseUrl = $request->getSchemeAndHttpHost(); // http://127.0.0.1:8000
+        $baseUrl = $request->getSchemeAndHttpHost();
         $response = $this->client->request('GET', $baseUrl . '/api/searchComicsByTitle?title=' . urlencode($title));
 
         $comicsData = $response->toArray();
@@ -48,6 +100,4 @@ final class ComicsFrontController extends AbstractController
             'comics' => $comicsData['member'] ?? [],
         ]);
     }
-
-
 }
