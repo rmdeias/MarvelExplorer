@@ -3,9 +3,11 @@
 namespace App\Controller\Front;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+
 
 final class ComicsFrontController extends AbstractController
 {
@@ -14,16 +16,38 @@ final class ComicsFrontController extends AbstractController
     }
 
     #[Route('/comics', name: 'front_comics')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        // Appel API REST interne
-        $apiUrl = 'http://127.0.0.1:8000/api/comics?limit=10&sort=recent';
+        // Appel API pour le top récents
+        $baseUrl = $request->getSchemeAndHttpHost(); // http://127.0.0.1:8000
+        $response = $this->client->request('GET', $baseUrl . '/api/topRecentComics');
 
-        $response = $this->client->request('GET', $apiUrl);
-        $comics = $response->toArray()['data'] ?? [];
+        $topComics = $response->toArray();
 
         return $this->render('comics/index.html.twig', [
-            'comics' => $comics,
+            'comics' => $topComics['member'],
+        ]);
+
+    }
+
+    #[Route('/comics/search', name: 'front_comics_search', methods: ['GET'])]
+    public function search(Request $request): Response
+    {
+        $title = $request->query->get('title', '');
+        if (empty($title)) {
+            return $this->redirectToRoute('front_comics');
+        }
+
+        // Appel API pour la recherche
+        $baseUrl = $request->getSchemeAndHttpHost(); // http://127.0.0.1:8000
+        $response = $this->client->request('GET', $baseUrl . '/api/searchComicsByTitle?title=' . urlencode($title));
+
+        $comicsData = $response->toArray();
+
+        return $this->render('comics/_list.html.twig', [
+            'comics' => $comicsData['member'] ?? [],
         ]);
     }
+
+
 }
