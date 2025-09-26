@@ -36,7 +36,7 @@ class SeriesFixtures extends Fixture implements FixtureGroupInterface
     public function load(ObjectManager $manager): void
     {
         $offset = 0;
-        $limit = 25;
+        $limit = 35;
         $moreData = true;
 
         echo "--- start of import ---\n";

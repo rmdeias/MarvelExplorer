@@ -36,14 +36,14 @@ class ComicsFixtures extends Fixture implements FixtureGroupInterface
     public function load(ObjectManager $manager): void
     {
         $offset = 0;
-        $limit = 50;
+        $limit = 45;
         $moreData = true;
 
         echo "--- start of import ---\n";
 
         while ($moreData) {
             try {
-                $comics = $this->marvelApi->getComics($limit, null, $offset);
+                $comics = $this->marvelApi->getComics($limit, $offset);
                 $count = count($comics);
 
                 echo "Batch offset $offset : $count comics\n";
