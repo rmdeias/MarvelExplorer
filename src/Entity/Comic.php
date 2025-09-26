@@ -179,7 +179,7 @@ class Comic
 
     public function getThumbnail(): ?string
     {
-        return $this->thumbnail ?: '/assets/images/comic-no-img.jpg';
+        return $this->thumbnail;
     }
 
     public function setThumbnail(?string $thumbnail): static
@@ -192,12 +192,6 @@ class Comic
     public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
-    }
-
-    #[Groups(['comic:read'])]
-    public function getDateFormatted(): ?string
-    {
-        return $this->date?->format('Y-m-d');
     }
 
 
