@@ -16,6 +16,46 @@ class ComicRepository extends ServiceEntityRepository
         parent::__construct($registry, Comic::class);
     }
 
+    /**
+     * Top 10 comics récents, exclusions des variants/paperback/hardcover
+     */
+    public function findTopRecentComics(): array
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        $qb->where('c.date <= :today')
+            ->andWhere('c.title NOT LIKE :variant')
+            ->andWhere('c.title NOT LIKE :paperback')
+            ->andWhere('c.title NOT LIKE :hardcover')
+            ->setParameter('today', new \DateTime())
+            ->setParameter('variant', '%variant%')
+            ->setParameter('paperback', '%paperback%')
+            ->setParameter('hardcover', '%hardcover%')
+            ->orderBy('c.date', 'DESC')
+            ->setMaxResults(20);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function searchComicsByTitle(string $title): array
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        $qb->where('c.title LIKE :search')
+            ->andWhere('c.title NOT LIKE :variant')
+            ->andWhere('c.title NOT LIKE :paperback')
+            ->andWhere('c.title NOT LIKE :hardcover')
+            ->setParameter('search', '%' . $title . '%')
+            ->setParameter('variant', '%variant%')
+            ->setParameter('paperback', '%paperback%')
+            ->setParameter('hardcover', '%hardcover%')
+            ->orderBy('c.title', 'ASC')
+            ->setMaxResults(50);
+
+        return $qb->getQuery()->getResult();
+    }
+
+
     //    /**
     //     * @return Comic[] Returns an array of Comic objects
     //     */
