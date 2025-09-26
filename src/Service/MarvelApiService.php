@@ -108,6 +108,26 @@ class MarvelApiService
         return null;
     }
 
+
+    private function extractOnsaleDate(array $dates): ?\DateTimeImmutable
+    {
+        foreach ($dates as $d) {
+            if ($d['type'] === 'onsaleDate' && !empty($d['date'])) {
+                try {
+                    $date = new \DateTimeImmutable($d['date']);
+                    // on vérifie que la date est raisonnable
+                    if ((int)$date->format('Y') > 1900) {
+                        return $date;
+                    }
+                } catch (\Exception) {
+                    return null; // si la date est complètement pourrie
+                }
+            }
+        }
+        return null;
+    }
+
+
     /**
      * Retrieves Marvel characters.
      *
@@ -175,10 +195,8 @@ class MarvelApiService
                 'description' => $c['description'] ?: 'No description available',
                 'thumbnail' => "{$c['thumbnail']['path']}.{$c['thumbnail']['extension']}",
                 'pageCount' => $c['pageCount'] ?? 0,
-                'dates' => (function ($dates) {
-                    $onsale = array_filter($dates, fn($d) => $d['type'] === 'onsaleDate');
-                    return !empty($onsale) ? explode('T', array_values($onsale)[0]['date'])[0] : null;
-                })($c['dates'] ?? []),
+                'dates' => $this->extractOnsaleDate($c['dates'] ?? []),
+
                 'variants' => array_map(
                     fn($variant) => (int)$this->catchIdWithURI($variant['resourceURI']),
                     $c['variants'] ?? []
