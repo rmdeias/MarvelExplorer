@@ -53,7 +53,7 @@ final class ComicsFrontController extends AbstractController
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      */
-    #[Route('/comics', name: 'front_comics')]
+    #[Route('/', name: 'front_comics')]
     public function index(Request $request): Response
     {
         $baseUrl = $request->getSchemeAndHttpHost();
@@ -98,6 +98,41 @@ final class ComicsFrontController extends AbstractController
 
         return $this->render('comics/_list.html.twig', [
             'comics' => $comicsData['member'] ?? [],
+        ]);
+    }
+
+    /**
+     * Comic page details.
+     *
+     * Reads the 'id' query parameter from the request, calls the internal API
+     * endpoint '/api/comics/{id}-{slug}', and renders the results in the
+     * 'comics/comic_details.html.twig' template.
+     * If the id is empty, redirects to the main comics page.
+     *
+     * @param Request $request HTTP request object
+     * @return Response Rendered HTML response with search results
+     *
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    #[Route('/comics/{id}-{slug}', name: 'comic_details', methods: ['GET'])]
+    public function comicDetails(Request $request, string $id): Response
+    {
+
+        if (empty($id)) {
+            return $this->redirectToRoute('front_comics');
+        }
+
+        $baseUrl = $request->getSchemeAndHttpHost();
+        $response = $this->client->request('GET', $baseUrl . '/api/comics/' . urlencode($id));
+
+        $comicDetailsData = $response->toArray();
+
+        return $this->render('comics/comic_details.html.twig', [
+            'comicDetails' => $comicsDetailsData['member'] ?? [],
         ]);
     }
 }

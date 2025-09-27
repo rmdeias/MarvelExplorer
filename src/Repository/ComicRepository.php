@@ -44,7 +44,7 @@ class ComicRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('c');
 
-        $qb->select('c.id','c.title', 'c.date', 'c.thumbnail')
+        $qb->select('c.id', 'c.title', 'c.date', 'c.thumbnail', 'c.slug')
             ->where('c.date <= :today')
             ->andWhere('c.title NOT LIKE :variant')
             ->andWhere('c.title NOT LIKE :paperback')
@@ -56,7 +56,8 @@ class ComicRepository extends ServiceEntityRepository
             ->orderBy('c.date', 'DESC')
             ->setMaxResults(20);
 
-        return $qb->getQuery()->getResult();
+        $results = $qb->getQuery()->getResult();
+        return array_map(fn($r) => new ComicsListDTO($r['id'], $r['title'], $r['date'], $r['thumbnail'], $r['slug']), $results);
     }
 
     /**
@@ -72,7 +73,7 @@ class ComicRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('c');
 
-        $qb->select('c.id','c.title', 'c.date', 'c.thumbnail')
+        $qb->select('c.id', 'c.title', 'c.date', 'c.thumbnail', 'c.slug')
             ->where('c.title LIKE :search')
             ->andWhere('c.title NOT LIKE :variant')
             ->andWhere('c.title NOT LIKE :paperback')
@@ -86,8 +87,9 @@ class ComicRepository extends ServiceEntityRepository
 
         $results = $qb->getQuery()->getResult();
 
-        return array_map(fn($r) => new ComicsListDTO($r['id'], $r['title'], $r['date'], $r['thumbnail']), $results);
+        return array_map(fn($r) => new ComicsListDTO($r['id'], $r['title'], $r['date'], $r['thumbnail'], $r['slug']), $results);
     }
+
 
     // Uncommented sample methods for reference
     /*
