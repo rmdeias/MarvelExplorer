@@ -25,7 +25,6 @@ use Doctrine\ORM\Mapping as ORM;
     denormalizationContext: ['groups' => ['comic:write']],
     operations: [
         new GetCollection(
-            name: 'default',
             uriTemplate: '/comics'
         ),
         new GetCollection(
