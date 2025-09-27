@@ -1,9 +1,11 @@
 {% for comic in comics %}
-    <div class="comic-card">
-        <img src="{{ comic.thumbnail ?: asset('assets/images/comic-no-img.jpg') }}" alt="{{ comic.title }}">
-        <h3>{{ comic.title }}</h3>
-        <p>{{ comic.date|date("Y-m-d") ?: 'unknown date' }}</p>
-    </div>
+    <a href="comics/{{ comic.id }}-{{ comic.slug }}">
+        <div class="comic-card">
+            <img src="{{ comic.thumbnail ?: asset('assets/images/comic-no-img.jpg') }}" alt="{{ comic.title }}">
+            <h3>{{ comic.title }}</h3>
+            <p>{{ comic.date|date("Y-m-d") ?: 'unknown date' }}</p>
+        </div>
+    </a>
 {% else %}
     <p>Aucun comic trouvé.</p>
 {% endfor %}

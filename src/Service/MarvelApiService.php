@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Exception\{
     DecodingExceptionInterface,
@@ -169,11 +170,12 @@ class MarvelApiService
      *     description:string,
      *     thumbnail:string,
      *     pageCount:int,
-     *     dates:string|null,
+     *     dates:\DateTimeImmutable|null,
      *     variants:array<int|null>,
      *     creators:array<int, array{marvelCreatorId:int|null, role:string}>,
      *     marvelIdSerie:int,
-     *     marvelIdsCharacter:array<int|null>
+     *     marvelIdsCharacter:array<int|null>,
+     *     slug:string
      * }>
      *
      * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface
@@ -183,8 +185,9 @@ class MarvelApiService
     {
         $results = $this->fetchData('comics', $limit, $offset, $modifiedSince);
 
-        return array_map(function ($c) {
 
+        return array_map(function ($c) {
+            $slugger = new AsciiSlugger();
             if(strpos($c['thumbnail']['path'], 'image_not_available')) {
                 $c['thumbnail']['path'] = '';
                 $c['thumbnail']['extension'] = '';
@@ -215,6 +218,7 @@ class MarvelApiService
                     fn($character) => $this->catchIdWithURI($character['resourceURI']),
                     $c['characters']['items'] ?? []
                 ),
+                'slug' => isset($c['title']) ? strtolower($slugger->slug($c['title'])) : 'untitled' ,
             ];
         }, $results);
     }

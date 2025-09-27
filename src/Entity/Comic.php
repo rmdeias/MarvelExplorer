@@ -6,6 +6,7 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\DataProvider\ComicDataProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -37,6 +38,10 @@ use Doctrine\ORM\Mapping as ORM;
             name: 'topRecentComics',
             uriTemplate: '/topRecentComics',
             provider: ComicDataProvider::class
+        ),
+        new Get(
+            uriTemplate: '/comics/{id}',
+            uriVariables: ['id' => 'id']
         ),
     ],
 )]
@@ -106,6 +111,10 @@ class Comic
     #[ORM\Column(type: 'json', nullable: true)]
     #[Groups(['comic:read'])]
     private array $marvelIdsCharacter = [];
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['comic:read'])]
+    private string $slug;
 
     public function __construct()
     {
@@ -292,6 +301,17 @@ class Comic
     {
         $this->marvelIdsCharacter = $marvelIdsCharacter;
 
+        return $this;
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
         return $this;
     }
 }

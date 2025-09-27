@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * - title: the comic's title
  * - date: the release or publication date
  * - thumbnail: URL or path to the comic's thumbnail image
+ * - slug: the comic's title for url
  *
  * DTOs are simple objects meant to transfer data without any business logic.
  */
@@ -32,12 +33,17 @@ class ComicsListDTO
     #[Groups(['comic:read'])]
     public string $thumbnail;
 
-    public function __construct(int $id, string $title, \DateTimeInterface $date, string $thumbnail)
+    #[Groups(['comic:read'])]
+    public string $slug;
+
+
+    public function __construct(int $id, string $title, \DateTimeInterface $date, string $thumbnail, string $slug)
     {
         $this->id = $id;
         $this->title = $title;
         $this->date = $date;
         $this->thumbnail = $thumbnail;
+        $this->slug = $slug;
     }
 
 }
