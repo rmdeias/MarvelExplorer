@@ -1,40 +1,62 @@
 <?php
 
 namespace App\Entity;
-
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\SerieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SerieRepository::class)]
 #[ORM\Table(name: '`serie`', indexes: [
     new ORM\Index(name: 'idx_marvel_id', columns: ['marvelId'])
 ])]
+#[ApiResource(
+    normalizationContext: ['groups' => ['serie:read']],
+    operations: [
+        new GetCollection(
+            uriTemplate: '/series'
+        ),
+        new Get(
+            uriTemplate: '/series/{id}',
+            uriVariables: ['id' => 'id']
+        ),
+    ],
+)]
 class Serie
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?int $marvelId = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?string $startYear = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?string $endYear = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?string $thumbnail = null;
 
     /**
