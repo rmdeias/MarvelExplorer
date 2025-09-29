@@ -3,6 +3,7 @@
 namespace App\Controller\Front;
 
 use App\Service\ExtractCreatorService;
+use App\Service\ExtractVariantService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,7 +36,10 @@ final class ComicsFrontController extends AbstractController
      *
      * @param HttpClientInterface $client Http client used to call internal API endpoints
      */
-    public function __construct(private readonly HttpClientInterface $client, private readonly ExtractCreatorService $extractCreatorsService)
+    public function __construct(
+        private readonly HttpClientInterface $client,
+        private readonly ExtractCreatorService $extractCreatorsService,
+        private readonly ExtractVariantService $extractVariantsService)
     {
     }
 
@@ -97,6 +101,7 @@ final class ComicsFrontController extends AbstractController
 
         $comicsData = $response->toArray();
 
+
         return $this->render('comics/_list.html.twig', [
             'comics' => $comicsData['member'] ?? [],
         ]);
@@ -132,7 +137,10 @@ final class ComicsFrontController extends AbstractController
 
         $comicDetailsData = $response->toArray();
         $comicDetailsData = $this->extractCreatorsService->enrichCreators($comicDetailsData, $baseUrl);
+        $comicDetailsData = $this->extractVariantsService->enrichVariants($comicDetailsData, $baseUrl);
 
+
+        dd($comicDetailsData);
         return $this->render('comics/comic_details.html.twig', [
             'comicDetails' => $comicsDetailsData ?? [],
         ]);
