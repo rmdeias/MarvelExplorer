@@ -159,6 +159,7 @@
       <path value="$PROJECT_DIR$/vendor/api-platform/serializer" />
       <path value="$PROJECT_DIR$/vendor/api-platform/symfony" />
       <path value="$PROJECT_DIR$/vendor/nelmio/cors-bundle" />
+      <path value="$PROJECT_DIR$/vendor/twig/string-extra" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2">
