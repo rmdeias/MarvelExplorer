@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\CharacterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,6 +18,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
 ])]
 #[ApiResource(
     normalizationContext: ['groups' => ['character:read']],
+    operations: [
+        new GetCollection(
+            uriTemplate: '/characters'
+        ),
+        new Get(
+            uriTemplate: '/characters/{id}',
+            uriVariables: ['id' => 'id']
+        ),
+    ],
 )]
 class Character
 {
