@@ -67,6 +67,7 @@ class ComicsFixtures extends Fixture implements FixtureGroupInterface
                     $comicEntity->setCreators($comic['creators'] ?? []);
                     $comicEntity->setMarvelIdSerie($comic['marvelIdSerie'] ?? 0);
                     $comicEntity->setMarvelIdsCharacter($comic['marvelIdsCharacter'] ?? []);
+                    $comicEntity->setSlug($comic['slug']);
 
                     $manager->persist($comicEntity);
                 }
