@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Get(
             uriTemplate: '/characters/{id}',
-            uriVariables: ['id' => 'id']
+            uriVariables: ['id' => 'marvelId']
         ),
     ],
 )]
