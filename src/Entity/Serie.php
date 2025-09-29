@@ -32,7 +32,6 @@ class Serie
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['comic:read', 'serie:read'])]
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
@@ -63,12 +62,14 @@ class Serie
      * @var Collection<int, Comic>
      */
     #[ORM\OneToMany(targetEntity: Comic::class, mappedBy: 'serie')]
+    #[Groups(['serie:read'])]
     private Collection $comics;
 
     /**
      * @var Collection<int, Character>
      */
     #[ORM\ManyToMany(targetEntity: Character::class, inversedBy: 'series')]
+    #[Groups(['serie:read'])]
     private Collection $characters;
 
     #[ORM\Column(type: 'json', nullable: true)]

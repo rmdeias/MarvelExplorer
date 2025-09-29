@@ -38,7 +38,6 @@ class Creator
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['creator:read'])]
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
