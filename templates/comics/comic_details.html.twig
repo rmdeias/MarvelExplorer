@@ -2,4 +2,57 @@
 
 {% block body %}
 
+    <div class="comic-detail">
+        <div class="comic-main">
+            <!-- Image principale -->
+            <div class="comic-image">
+                <img src="{{ comic.thumbnail }}" alt="{{ comic.title }}">
+            </div>
+
+            <!-- Infos du comic -->
+            <div class="comic-info">
+                <h1>{{ comic.title }}</h1>
+                <p class="description">{{ comic.description }}</p>
+
+                {% if comic.creators is not empty %}
+                    <h2>Creators</h2>
+                    <ul class="creators">
+                        {% for creator in comic.creators %}
+                            <li>
+                                <span class="role">{{ creator.role|capitalize }}</span> :
+                                {{ creator.fullName ?? 'Unknown' }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if comic.serie is defined %}
+                    <h2>Serie</h2>
+                    <div class="serie">
+                        <img src="{{ comic.serie.thumbnail }}" alt="{{ comic.serie.title }}">
+                        <span>{{ comic.serie.title }}</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if comic.variants is not empty %}
+            <div class="comic-variants">
+                <h2>Variants</h2>
+                <div class="variant-list">
+                    {% for variant in comic.variants %}
+                        <div class="variant-card">
+                            <a href="/comics/{{ variant.marvelId }}/{{ variant.slug }}">
+                                <img src="{{ variant.thumbnail }}" alt="{{ variant.title }}">
+                                <p>{{ variant.title }}</p>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+
+
 {% endblock %}

@@ -140,9 +140,8 @@ final class ComicsFrontController extends AbstractController
         $comicDetailsData = $this->extractVariantsService->enrichVariants($comicDetailsData, $baseUrl);
 
 
-        dd($comicDetailsData);
         return $this->render('comics/comic_details.html.twig', [
-            'comicDetails' => $comicsDetailsData ?? [],
+            'comic' => $comicDetailsData ?? [],
         ]);
     }
 }
