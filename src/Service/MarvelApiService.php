@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Exception\{
     DecodingExceptionInterface,
@@ -174,8 +173,7 @@ class MarvelApiService
      *     variants:array<int|null>,
      *     creators:array<int, array{marvelCreatorId:int|null, role:string}>,
      *     marvelIdSerie:int,
-     *     marvelIdsCharacter:array<int|null>,
-     *     slug:string
+     *     marvelIdsCharacter:array<int|null>
      * }>
      *
      * @throws TransportExceptionInterface|ClientExceptionInterface|ServerExceptionInterface
@@ -187,8 +185,8 @@ class MarvelApiService
 
 
         return array_map(function ($c) {
-            $slugger = new AsciiSlugger();
-            if(strpos($c['thumbnail']['path'], 'image_not_available')) {
+
+            if (strpos($c['thumbnail']['path'], 'image_not_available')) {
                 $c['thumbnail']['path'] = '';
                 $c['thumbnail']['extension'] = '';
             }
@@ -218,7 +216,6 @@ class MarvelApiService
                     fn($character) => $this->catchIdWithURI($character['resourceURI']),
                     $c['characters']['items'] ?? []
                 ),
-                'slug' => isset($c['title']) ? strtolower($slugger->slug($c['title'])) : 'untitled' ,
             ];
         }, $results);
     }
@@ -289,25 +286,33 @@ class MarvelApiService
     {
         $results = $this->fetchData('series', $limit, $offset, $modifiedSince);
 
-        return array_map(fn($c) => [
-            'marvelId' => $c['id'],
-            'title' => $c['title'],
-            'description' => $c['description'] ?: 'No description available',
-            'thumbnail' => "{$c['thumbnail']['path']}.{$c['thumbnail']['extension']}",
-            'startYear' => $c['startYear'],
-            'endYear' => $c['endYear'],
+        return array_map(function ($c) {
+            if (strpos($c['thumbnail']['path'], 'image_not_available')) {
+                $c['thumbnail']['path'] = '';
+                $c['thumbnail']['extension'] = '';
+            }
+            return [
+                'marvelId' => $c['id'],
+                'title' => $c['title'],
+                'description' => $c['description'] ?: 'No description available',
+                'thumbnail' => "{$c['thumbnail']['path']}.{$c['thumbnail']['extension']}",
+                'startYear' => $c['startYear'],
+                'endYear' => $c['endYear'],
 
-            'creators' => array_map(function ($creator) {
-                $marvelCreatorId = $this->catchIdWithURI($creator['resourceURI']);
-                return [
-                    'marvelCreatorId' => $marvelCreatorId,
-                    'role' => $creator['role'],
-                ];
-            }, $c['creators']['items'] ?? []),
+                'creators' => array_map(function ($creator) {
+                    $marvelCreatorId = $this->catchIdWithURI($creator['resourceURI']);
+                    return [
+                        'marvelCreatorId' => $marvelCreatorId,
+                        'role' => $creator['role'],
+                    ];
+                }, $c['creators']['items'] ?? []),
 
-            'marvelIdsCharacter' => array_map(function ($character) {
-                return $this->catchIdWithURI($character['resourceURI']);
-            }, $c['characters']['items'] ?? [])
-        ], $results);
+                'marvelIdsCharacter' => array_map(fn($character) => $this->catchIdWithURI($character['resourceURI']),
+                    $c['characters']['items'] ?? []
+                ),
+            ];
+        }, $results);
+
     }
+
 }
