@@ -28,10 +28,13 @@
 
                 {% if comic.serie is defined %}
                     <h2>Serie</h2>
-                    <div class="serie">
-                        <img src="{{ comic.serie.thumbnail }}" alt="{{ comic.serie.title }}">
-                        <span>{{ comic.serie.title }}</span>
-                    </div>
+                    <a href="/series/{{ comic.serie.marvelId }}-{{ comic.serie.title |slug|lower}}">
+                        <div class="comic-card">
+                            <img src="{{ comic.serie.thumbnail ?: asset('assets/images/comic-no-img.jpg') }}" alt="{{ comic.serie.title }}">
+                            <h3>{{ comic.serie.title }}</h3>
+                            <p>{{ comic.date|date("Y-m-d") ?: 'unknown date' }}</p>
+                        </div>
+                    </a>
                 {% endif %}
             </div>
         </div>
@@ -42,7 +45,7 @@
                 <div class="variant-list">
                     {% for variant in comic.variants %}
                         <div class="variant-card">
-                            <a href="/comics/{{ variant.marvelId }}/{{ variant.slug }}">
+                            <a href="/comics/{{ variant.marvelId }}-{{ variant.title |slug|lower }}">
                                 <img src="{{ variant.thumbnail }}" alt="{{ variant.title }}">
                                 <p>{{ variant.title }}</p>
                             </a>

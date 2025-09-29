@@ -1,5 +1,5 @@
 {% for comic in comics %}
-    <a href="comics/{{ comic.marvelId }}-{{ comic.slug }}">
+    <a href="/comics/{{ comic.marvelId }}-{{ comic.title |slug|lower }}">
         <div class="comic-card">
             <img src="{{ comic.thumbnail ?: asset('assets/images/comic-no-img.jpg') }}" alt="{{ comic.title }}">
             <h3>{{ comic.title }}</h3>
