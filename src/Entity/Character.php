@@ -33,15 +33,14 @@ class Character
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['comic:read', 'character:read'])]
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
-    #[Groups(['comic:read', 'character:read'])]
+    #[Groups(['comic:read', 'character:read','serie:read'])]
     private ?int $marvelId = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['comic:read', 'character:read'])]
+    #[Groups(['comic:read', 'character:read','serie:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -53,7 +52,7 @@ class Character
     private ?string $modified = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['comic:read', 'character:read'])]
+    #[Groups(['comic:read', 'character:read','serie:read'])]
     private ?string $thumbnail = null;
 
     /**
