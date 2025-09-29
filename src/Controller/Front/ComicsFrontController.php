@@ -2,6 +2,7 @@
 
 namespace App\Controller\Front;
 
+use App\Service\ExtractCreatorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +35,7 @@ final class ComicsFrontController extends AbstractController
      *
      * @param HttpClientInterface $client Http client used to call internal API endpoints
      */
-    public function __construct(private readonly HttpClientInterface $client)
+    public function __construct(private readonly HttpClientInterface $client, private readonly ExtractCreatorService $extractCreatorsService)
     {
     }
 
@@ -130,9 +131,10 @@ final class ComicsFrontController extends AbstractController
         $response = $this->client->request('GET', $baseUrl . '/api/comics/' . urlencode($id));
 
         $comicDetailsData = $response->toArray();
+        $comicDetailsData = $this->extractCreatorsService->enrichCreators($comicDetailsData, $baseUrl);
 
         return $this->render('comics/comic_details.html.twig', [
-            'comicDetails' => $comicsDetailsData['member'] ?? [],
+            'comicDetails' => $comicsDetailsData ?? [],
         ]);
     }
 }
