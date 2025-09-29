@@ -38,13 +38,13 @@ class ComicRepository extends ServiceEntityRepository
      * Excludes variants, paperback, and hardcover editions.
      *
      * @return array<int, array> Array of comics as associative arrays with keys:
-     *                           'id', 'title', 'date', 'thumbnail'
+     *                           'marvelId', 'title', 'date', 'thumbnail'
      */
     public function findTopRecentComics(): array
     {
         $qb = $this->createQueryBuilder('c');
 
-        $qb->select('c.id', 'c.title', 'c.date', 'c.thumbnail', 'c.slug')
+        $qb->select('c.marvelId', 'c.title', 'c.date', 'c.thumbnail', 'c.slug')
             ->where('c.date <= :today')
             ->andWhere('c.title NOT LIKE :variant')
             ->andWhere('c.title NOT LIKE :paperback')
@@ -57,7 +57,7 @@ class ComicRepository extends ServiceEntityRepository
             ->setMaxResults(20);
 
         $results = $qb->getQuery()->getResult();
-        return array_map(fn($r) => new ComicsListDTO($r['id'], $r['title'], $r['date'], $r['thumbnail'], $r['slug']), $results);
+        return array_map(fn($r) => new ComicsListDTO($r['marvelId'], $r['title'], $r['date'], $r['thumbnail'], $r['slug']), $results);
     }
 
     /**
@@ -67,13 +67,13 @@ class ComicRepository extends ServiceEntityRepository
      * Returns an array of ComicsListDTO objects.
      *
      * @param string $title The title string to search for
-     * @return ComicsListDTO[] Array of DTOs containing id, title, date, and thumbnail
+     * @return ComicsListDTO[] Array of DTOs containing marvelId, title, date, and thumbnail
      */
     public function searchComicsByTitle(string $title): array
     {
         $qb = $this->createQueryBuilder('c');
 
-        $qb->select('c.id', 'c.title', 'c.date', 'c.thumbnail', 'c.slug')
+        $qb->select('c.marvelId', 'c.title', 'c.date', 'c.thumbnail', 'c.slug')
             ->where('c.title LIKE :search')
             ->andWhere('c.title NOT LIKE :variant')
             ->andWhere('c.title NOT LIKE :paperback')
@@ -87,7 +87,7 @@ class ComicRepository extends ServiceEntityRepository
 
         $results = $qb->getQuery()->getResult();
 
-        return array_map(fn($r) => new ComicsListDTO($r['id'], $r['title'], $r['date'], $r['thumbnail'], $r['slug']), $results);
+        return array_map(fn($r) => new ComicsListDTO($r['marvelId'], $r['title'], $r['date'], $r['thumbnail'], $r['slug']), $results);
     }
 
 

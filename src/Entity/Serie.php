@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Get(
             uriTemplate: '/series/{id}',
-            uriVariables: ['id' => 'id']
+            uriVariables: ['id' => 'marvelId']
         ),
     ],
 )]
