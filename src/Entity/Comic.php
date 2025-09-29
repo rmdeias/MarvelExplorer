@@ -40,7 +40,7 @@ use Doctrine\ORM\Mapping as ORM;
         ),
         new Get(
             uriTemplate: '/comics/{id}',
-            uriVariables: ['id' => 'id']
+            uriVariables: ['id' => 'marvelId']
         ),
     ],
 )]

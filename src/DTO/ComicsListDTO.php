@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ComicsListDTO
 {
     #[Groups(['comic:read'])]
-    public int $id;
+    public int $marvelId;
 
     #[Groups(['comic:read'])]
     public string $title;
@@ -37,9 +37,9 @@ class ComicsListDTO
     public string $slug;
 
 
-    public function __construct(int $id, string $title, \DateTimeInterface $date, string $thumbnail, string $slug)
+    public function __construct(int $marvelId, string $title, \DateTimeInterface $date, string $thumbnail, string $slug)
     {
-        $this->id = $id;
+        $this->marvelId = $marvelId;
         $this->title = $title;
         $this->date = $date;
         $this->thumbnail = $thumbnail;
