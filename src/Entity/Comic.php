@@ -51,15 +51,14 @@ class Comic
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['comic:read'])]
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
-    #[Groups(['comic:read'])]
+    #[Groups(['comic:read', 'serie:read'] )]
     private ?int $marvelId = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['comic:read'])]
+    #[Groups(['comic:read','serie:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -75,11 +74,11 @@ class Comic
     private ?string $modified = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['comic:read'])]
+    #[Groups(['comic:read','serie:read'])]
     private ?string $thumbnail = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[Groups(['comic:read'])]
+    #[Groups(['comic:read','serie:read'])]
     private ?\DateTimeInterface $date = null;
 
 
@@ -110,10 +109,6 @@ class Comic
     #[ORM\Column(type: 'json', nullable: true)]
     #[Groups(['comic:read'])]
     private array $marvelIdsCharacter = [];
-
-    #[ORM\Column(length: 255)]
-    #[Groups(['comic:read'])]
-    private string $slug;
 
     public function __construct()
     {
@@ -303,14 +298,4 @@ class Comic
         return $this;
     }
 
-    public function getSlug(): string
-    {
-        return $this->slug;
-    }
-
-    public function setSlug(string $slug): self
-    {
-        $this->slug = $slug;
-        return $this;
-    }
 }

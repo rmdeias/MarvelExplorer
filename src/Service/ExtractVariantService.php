@@ -32,7 +32,6 @@ readonly class ExtractVariantService
                             'marvelId' => $variantData['marvelId'] ?? null,
                             'title' => $variantData['title'] ?? null,
                             'description' => $variantData['description'],
-                            'slug' => $variantData['slug'] ?? null,
                             'thumbnail' => $variantData['thumbnail'] ?? null,
                         ];
                     }
