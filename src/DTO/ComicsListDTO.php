@@ -28,14 +28,12 @@ class ComicsListDTO
     public string $title;
 
     #[Groups(['comic:read'])]
-    public \DateTimeInterface $date;
+    public ?\DateTimeInterface $date; // ← nullable
 
     #[Groups(['comic:read'])]
     public string $thumbnail;
 
-
-
-    public function __construct(int $marvelId, string $title, \DateTimeInterface $date, string $thumbnail)
+    public function __construct(int $marvelId, string $title, ?\DateTimeInterface $date, string $thumbnail)
     {
         $this->marvelId = $marvelId;
         $this->title = $title;
