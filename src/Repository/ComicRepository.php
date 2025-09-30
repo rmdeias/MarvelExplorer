@@ -57,7 +57,14 @@ class ComicRepository extends ServiceEntityRepository
             ->setMaxResults(20);
 
         $results = $qb->getQuery()->getResult();
-        return array_map(fn($r) => new ComicsListDTO($r['marvelId'], $r['title'], $r['date'], $r['thumbnail']), $results);
+
+        return array_map(fn($r) => new ComicsListDTO(
+            $r['marvelId'],
+            $r['title'],
+            $r['date'] ?? null, // permet null si la date n’existe pas
+            $r['thumbnail']
+        ), $results);
+
     }
 
     /**
@@ -83,11 +90,16 @@ class ComicRepository extends ServiceEntityRepository
             ->setParameter('paperback', '%paperback%')
             ->setParameter('hardcover', '%hardcover%')
             ->orderBy('c.title', 'ASC')
-            ->setMaxResults(50);
+            ->setMaxResults(500);
 
         $results = $qb->getQuery()->getResult();
 
-        return array_map(fn($r) => new ComicsListDTO($r['marvelId'], $r['title'], $r['date'], $r['thumbnail']), $results);
+        return array_map(fn($r) => new ComicsListDTO(
+            $r['marvelId'],
+            $r['title'],
+            $r['date'] ?? null, // permet null si la date n’existe pas
+            $r['thumbnail']
+        ), $results);
     }
 
 
