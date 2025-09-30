@@ -73,6 +73,7 @@ class Serie
     private Collection $characters;
 
     #[ORM\Column(type: 'json', nullable: true)]
+     #[Groups(['serie:read'])]
     private ?array $creators = null;
 
     #[ORM\Column]
