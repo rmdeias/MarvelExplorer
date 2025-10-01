@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <div class="comic-detail">
+        <div class="comic-main">
+            <div class="comic-image">
+                <img src="{{ serie.thumbnail }}" alt="{{ serie.title }}">
+            </div>
+
+            <div class="comic-info">
+                <h1>{{ serie.title }}</h1>
+                <p class="description">{{ serie.description }}</p>
+                <p>Start year: {{ serie.startYear }}</p>
+                <p>End year: {{ serie.endYear }}</p>
+
+                {% if serie.creators is not empty %}
+                    <ul class="creators">
+                        {% for creator in serie.creators %}
+                            <li>
+                                <span class="role">{{ creator.role|capitalize }}</span> :
+                               <a href = "/creators/{{ creator.marvelId }}-{{ creator.fullName|slug|lower}}">{{ creator.fullName}}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% if serie.comics is not empty %}
+            <div class="comic-variants">
+                <h2>Comics</h2>
+                <div class="variant-list">
+                    {% for comic in serie.comics|sort %}
+                        {% if  'variant' not in comic.title|lower %}
+                            <div class="variant-card">
+                                <a href="/comics/{{ comic.marvelId }}-{{ comic.title|slug|lower }}">
+                                    <img src="{{ comic.thumbnail }}" alt="{{ comic.title }}"></a>
+                                <p>{{ comic.title }}</p>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if serie.characters is not empty %}
+            <div class="comic-variant">
+                <h2>Characters</h2>
+                <div class="variant-list">
+                    {% for character in serie.characters %}
+                        <div class="variant-card">
+                            <a href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
+                                <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
+                                <p>{{ character.name }}</p>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+
+
+{% endblock %}
