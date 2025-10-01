@@ -37,39 +37,55 @@ final class ComicsFrontController extends AbstractController
      * @param HttpClientInterface $client Http client used to call internal API endpoints
      */
     public function __construct(
-        private readonly HttpClientInterface $client,
+        private readonly HttpClientInterface   $client,
         private readonly ExtractCreatorService $extractCreatorsService,
         private readonly ExtractVariantService $extractVariantsService)
     {
     }
 
-    /**
-     * Displays the list of top recent comics.
-     *
-     * Calls the internal API endpoint '/api/topRecentComics' and passes
-     * the result to the 'comics/index.html.twig' template.
-     *
-     * @param Request $request HTTP request object
-     * @return Response Rendered HTML response with top comics
-     *
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
-    #[Route('/', name: 'front_comics')]
-    public function index(Request $request): Response
+
+    #[Route('/comics', name: 'front_comics')]
+    public function allComics(Request $request): Response
     {
         $baseUrl = $request->getSchemeAndHttpHost();
-        $response = $this->client->request('GET', $baseUrl . '/api/topRecentComics');
+        $page = max(1, (int)$request->query->get('page', 1));
+        $perPage = 20; // nombre de comics par page
 
-        $topComics = $response->toArray();
+        $response = $this->client->request('GET', $baseUrl . '/api/comics', [
+            'query' => [
+                'page' => $page,
+                'itemsPerPage' => $perPage,
+            ]
+        ]);
+
+        $data = $response->toArray();
+        $comics = $data['member'] ?? [];
+
+        usort($comics, fn($a, $b) => strnatcasecmp($a['title'], $b['title']));
+        $comics = array_filter($data['member'] ?? [], function ($comic) {
+            $title = strtolower($comic['title'] ?? '');
+            return stripos($title, 'variant') === false
+                && stripos($title, 'paperback') === false
+                && stripos($title, 'hardcover') === false;
+        });
+
+        $totalItems = $data['totalItems'] ?? count($comics);
+        $totalPages = ceil($totalItems / $perPage);
+
+        // Intervalle de pages visibles (par exemple par 10)
+        $pageRange = 10;
+        $startPage = max(1, $page - intval($pageRange / 2));
+        $endPage = min($totalPages, $startPage + $pageRange - 1);
 
         return $this->render('comics/index.html.twig', [
-            'comics' => $topComics['member'],
+            'comics' => $comics,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'startPage' => $startPage,
+            'endPage' => $endPage,
         ]);
     }
+
 
     /**
      * Searches for comics by title.

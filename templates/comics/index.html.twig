@@ -6,6 +6,25 @@
     <div class="comic-list" id="comic-list">
         {% include 'comics/_list.html.twig' with { comics: comics } %}
     </div>
+
+    <div class="pagination">
+        {% if currentPage > 1 %}
+            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage - 1})) }}">« Previous</a>
+        {% endif %}
+
+        {% for p in startPage..endPage %}
+            {% if p == currentPage %}
+                <span class="current">{{ p }}</span>
+            {% else %}
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': p})) }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if currentPage < totalPages %}
+            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage + 1})) }}">Next »</a>
+        {% endif %}
+    </div>
+
     <script>
         const searchInput = document.getElementById('search-bar');
         const comicList = document.getElementById('comic-list');
