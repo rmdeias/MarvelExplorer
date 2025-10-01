@@ -1,7 +1,41 @@
+
 body {
-    font-family: Arial;
-    margin: 2rem;
-    background: #f5f5f5;
+    background: url("https://www.transparenttextures.com/patterns/wall-4-light.png"),
+    linear-gradient(135deg, #0a0a0a 0%, #1b0000 40%, #7a0000 70%, #1b0000 90%);
+    background-attachment: fixed;
+    background-size: auto, cover;
+    color: #f5f5f5;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Navbar style */
+.navbar {
+    background: linear-gradient(90deg, #660000, #330000, #1a0000);
+    border-bottom: 2px solid #990000;
+}
+
+.navbar .nav-link {
+    color: #f8f8f8;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.navbar .nav-link:hover {
+    color: #ff1a1a;
+    transform: scale(1.05);
+}
+
+.navbar-brand img {
+    max-height: 40px;
+}
+
+.banner img {
+    max-height: 250px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.navbar .nav-link.active {
+    border-bottom: 2px solid #e62429;
 }
 
 h1 {
@@ -65,7 +99,7 @@ h1 {
 .comic-image img {
     max-width: 300px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .comic-info {
@@ -130,7 +164,7 @@ h1 {
 
 .variant-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .variant-card img {
