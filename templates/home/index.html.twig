@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <input type="text" id="search-bar" placeholder="Rechercher un comic..."/>
+
+    <div class="comic-list" id="comic-list">
+        {% include 'comics/_list.html.twig' with { comics: comics } %}
+    </div>
+{% endblock %}
