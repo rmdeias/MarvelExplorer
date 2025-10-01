@@ -23,6 +23,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource(
     normalizationContext: ['groups' => ['comic:read']],
     denormalizationContext: ['groups' => ['comic:write']],
+    paginationItemsPerPage: 100,   // 100 comics par page par défaut
+    order: ['title' => 'ASC'],      // tri alphabétique par défaut
     operations: [
         new GetCollection(
             uriTemplate: '/comics'
@@ -44,8 +46,7 @@ use Doctrine\ORM\Mapping as ORM;
         ),
     ],
 )]
-#[ApiFilter(SearchFilter::class, properties: ['title' => 'partial'])]
-#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'title' => 'ASC'])]
+#[ApiFilter(OrderFilter::class, properties: ['title'])]
 class Comic
 {
     #[ORM\Id]

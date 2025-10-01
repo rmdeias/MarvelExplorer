@@ -13,9 +13,10 @@
             <div class="comic-info">
                 <h1>{{ comic.title }}</h1>
                 <p class="description">{{ comic.description }}</p>
+                <p>pages: {{ comic.pageCount }}</p>
+                <p>date: {{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
 
                 {% if comic.creators is not empty %}
-                    <h2>Creators</h2>
                     <ul class="creators">
                         {% for creator in comic.creators %}
                             <li>
@@ -25,29 +26,43 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-
-                {% if comic.serie is defined %}
-                    <h2>Serie</h2>
-                    <a href="/series/{{ comic.serie.marvelId }}-{{ comic.serie.title |slug|lower}}">
-                        <div class="comic-card">
-                            <img src="{{ comic.serie.thumbnail ?: asset('assets/images/comic-no-img.jpg') }}" alt="{{ comic.serie.title }}">
-                            <h3>{{ comic.serie.title }}</h3>
-                            <p>{{ comic.date|date("Y-m-d") ?: 'unknown date' }}</p>
+                {% if comic.variants is not empty %}
+                    <div class="comic-variants">
+                        <h2>Variants</h2>
+                        <div class="variant-list">
+                            {% for variant in comic.variants %}
+                                <div class="variant-card">
+                                    <img src="{{ variant.thumbnail }}" alt="{{ variant.title }}">
+                                    <p>{{ variant.title }}</p>
+                                </div>
+                            {% endfor %}
                         </div>
-                    </a>
+                    </div>
                 {% endif %}
             </div>
+
         </div>
 
-        {% if comic.variants is not empty %}
-            <div class="comic-variants">
-                <h2>Variants</h2>
+        {% if comic.serie is defined %}
+            <h2>Serie</h2>
+            <a href="/series/{{ comic.serie.marvelId }}-{{ comic.serie.title |slug|lower}}">
+                <div class="comic-card">
+                    <img src="{{ comic.serie.thumbnail ?: asset('assets/images/comic-no-img.jpg') }}" alt="{{ comic.serie.title }}">
+                    <h3>{{ comic.serie.title }}</h3>
+                    <p>{{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
+                </div>
+            </a>
+        {% endif %}
+
+        {% if comic.characters is not empty %}
+            <div class="comic-variant">
+                <h2>Characters</h2>
                 <div class="variant-list">
-                    {% for variant in comic.variants %}
+                    {% for character in comic.characters %}
                         <div class="variant-card">
-                            <a href="/comics/{{ variant.marvelId }}-{{ variant.title |slug|lower }}">
-                                <img src="{{ variant.thumbnail }}" alt="{{ variant.title }}">
-                                <p>{{ variant.title }}</p>
+                            <a href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
+                                <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
+                                <p>{{ character.name }}</p>
                             </a>
                         </div>
                     {% endfor %}
