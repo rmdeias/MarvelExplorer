@@ -5,12 +5,14 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use App\DataProvider\CharacterDataProvider;
 use App\Repository\CharacterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: CharacterRepository::class)]
 #[ORM\Table(name: '`character`', indexes: [
@@ -22,10 +24,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new GetCollection(
             uriTemplate: '/characters'
         ),
+        new GetCollection(
+            name: 'searchCharactersByName',
+            uriTemplate: '/searchCharactersByName',
+            provider: CharacterDataProvider::class,
+            paginationEnabled: false
+        ),
         new Get(
             uriTemplate: '/characters/{id}',
             uriVariables: ['id' => 'marvelId']
         ),
+
     ],
 )]
 class Character
@@ -36,11 +45,11 @@ class Character
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
-    #[Groups(['comic:read', 'character:read','serie:read'])]
+    #[Groups(['comic:read', 'character:read', 'serie:read'])]
     private ?int $marvelId = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['comic:read', 'character:read','serie:read'])]
+    #[Groups(['comic:read', 'character:read', 'serie:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -52,20 +61,21 @@ class Character
     private ?string $modified = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['comic:read', 'character:read','serie:read'])]
+    #[Groups(['comic:read', 'character:read', 'serie:read'])]
     private ?string $thumbnail = null;
 
     /**
      * @var Collection<int, Comic>
      */
     #[ORM\ManyToMany(targetEntity: Comic::class, mappedBy: 'characters')]
-    #[Groups(['character:read'])]
     private Collection $comics;
 
     /**
      * @var Collection<int, Serie>
      */
     #[ORM\ManyToMany(targetEntity: Serie::class, mappedBy: 'characters')]
+    #[Groups(['character:read'])]
+    #[MaxDepth(1)]
     private Collection $series;
 
     public function __construct()
