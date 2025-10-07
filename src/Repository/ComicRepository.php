@@ -54,7 +54,7 @@ class ComicRepository extends ServiceEntityRepository
             ->setParameter('paperback', '%paperback%')
             ->setParameter('hardcover', '%hardcover%')
             ->orderBy('c.date', 'DESC')
-            ->setMaxResults(20);
+            ->setMaxResults(21);
 
         $results = $qb->getQuery()->getResult();
 

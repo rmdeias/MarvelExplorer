@@ -3,9 +3,9 @@
 {% block body %}
     <input type="text" id="search-bar" placeholder="Rechercher un comic..."/>
 
-    <div class="comic-list" id="comic-list">
+    <section class="comic-list" id="comic-list">
         {% include 'comics/_list.html.twig' with { comics: comics } %}
-    </div>
+    </section>
 
     <div class="pagination">
         {% if currentPage > 1 %}
