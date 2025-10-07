@@ -1,20 +1,53 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CharactersController!{% endblock %}
-
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <input type="text" id="search-bar" placeholder="Rechercher un character..."/>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <section class="characters-list" id="character-list">
+        {% include 'characters/_list.html.twig' with { characters: characters } %}
+    </section>
+    {#
+    <div class="pagination">
+        {% if currentPage > 1 %}
+            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage - 1})) }}">« Previous</a>
+        {% endif %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/ubuntu/PhpstormProjects/marvel-explorer/src/Controller/CharactersController.php</code></li>
-        <li>Your template at <code>/home/ubuntu/PhpstormProjects/marvel-explorer/templates/characters/index.html.twig</code></li>
-    </ul>
-</div>
+        {% for p in startPage..endPage %}
+            {% if p == currentPage %}
+                <span class="current">{{ p }}</span>
+            {% else %}
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': p})) }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if currentPage < totalPages %}
+            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage + 1})) }}">Next »</a>
+        {% endif %}
+    </div>
+    #}
+    <script>
+        const searchInput = document.getElementById('search-bar');
+        const characterList = document.getElementById('character-list');
+
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value.trim();
+
+            if (query === '') {
+                // Revenir à la liste initiale sans faire de fetch
+                characterList.innerHTML = `{% include 'characters/_list.html.twig' with { characters: characters } %}`;
+                return;
+            }
+
+            fetch(`/characters/search?name=${encodeURIComponent(query)}`)
+                .then(res => res.text())
+                .then(html => {
+                    characterList.innerHTML = html;
+                })
+                .catch(err => {
+                    console.error(err);
+                    characterList.innerHTML = '<p>Erreur lors de la récupération des characters.</p>';
+                });
+        });
+    </script>
+
 {% endblock %}

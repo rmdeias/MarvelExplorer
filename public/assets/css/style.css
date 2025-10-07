@@ -52,14 +52,14 @@ h1 {
     width: 300px;
 }
 
-.comic-list {
+.comic-list , .characters-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
     padding: 20px;
 }
 
-.comic-card {
+.comic-card , .character-card {
     position: relative;
     background: black;
     box-shadow: 0 2px 6px rgb(255, 255, 255);
@@ -70,7 +70,7 @@ h1 {
     text-align: center;
 }
 
-.comic-card img {
+.comic-card img , .character-card img {
     width: 100%;
 }
 
