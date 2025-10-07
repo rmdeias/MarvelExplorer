@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -35,11 +36,11 @@ class Serie
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
-    #[Groups(['comic:read', 'serie:read'])]
+    #[Groups(['comic:read', 'serie:read', 'character:read'])]
     private ?int $marvelId = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['comic:read', 'serie:read'])]
+    #[Groups(['comic:read', 'serie:read', 'character:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -55,7 +56,7 @@ class Serie
     private ?string $endYear = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['comic:read', 'serie:read'])]
+    #[Groups(['comic:read', 'serie:read', 'character:read'])]
     private ?string $thumbnail = null;
 
     /**
@@ -73,7 +74,7 @@ class Serie
     private Collection $characters;
 
     #[ORM\Column(type: 'json', nullable: true)]
-     #[Groups(['serie:read'])]
+    #[Groups(['serie:read'])]
     private ?array $creators = null;
 
     #[ORM\Column]
