@@ -31,11 +31,11 @@ final class CharactersFrontController extends AbstractController
      * Fetches the list of characters from the API, sorts them alphabetically by name,
      * and renders the index template.
      *
-     * @Route("/characters", name="front_characters")
      *
      * @param Request $request Symfony HTTP request object
      * @return Response The rendered HTML response
      */
+    #[Route('/characters', name: 'front_characters')]
     public function allCharacters(Request $request): Response
     {
         $baseUrl = $request->getSchemeAndHttpHost();
@@ -57,11 +57,10 @@ final class CharactersFrontController extends AbstractController
      * Accepts a query parameter `name` and fetches matching characters from the API.
      * If no name is provided, redirects to the main character list.
      *
-     * @Route("/characters/search", name="front_characters_search", methods={"GET"})
-     *
      * @param Request $request Symfony HTTP request object
      * @return Response The rendered HTML snippet with search results
      */
+    #[Route('/characters/search', name: 'front_characters_search', methods: ['GET'])]
     public function search(Request $request): Response
     {
         $name = $request->query->get('name', '');
@@ -88,12 +87,12 @@ final class CharactersFrontController extends AbstractController
      * Fetches a single character by ID from the API and renders the detail page.
      * If the ID is empty, redirects back to the character list.
      *
-     * @Route("/characters/{id}-{slug}", name="character_details", methods={"GET"})
      *
      * @param Request $request Symfony HTTP request object
      * @param string $id Marvel ID of the character
      * @return Response The rendered HTML response for the character
      */
+    #[Route('/characters/{id}-{slug}', name: 'character_details', methods: ['GET'])]
     public function characterDetails(Request $request, string $id): Response
     {
         if (empty($id)) {
