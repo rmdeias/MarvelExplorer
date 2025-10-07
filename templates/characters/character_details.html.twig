@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <div class="character-detail">
+        <div class="character-main">
+
+            <div class="character-image">
+                <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
+            </div>
+
+            <div class="character-info">
+                <h1>{{ character.name }}</h1>
+                <p class="description">{{ character.description }}</p>
+
+            </div>
+
+        </div>
+
+        {% if character.series is defined and  character.series|length > 0 %}
+            <h2>Serie</h2>
+            {% for serie in character.series %}
+                <a href="/series/{{ serie.marvelId }}-{{ serie.title |slug|lower }}">
+                    <div class="character-card">
+                        <img src="{{ serie.thumbnail ?: asset('assets/images/character-no-img.jpg') }}"
+                             alt="{{ serie.title }}">
+                        <h3>{{ serie.title }}</h3>
+                    </div>
+                </a>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+
+{% endblock %}

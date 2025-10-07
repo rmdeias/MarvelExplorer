@@ -1,0 +1,13 @@
+{% for character in characters %}
+    <a href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
+        <article class="character-card">
+            <img src="{{ character.thumbnail ?: asset('assets/images/character-no-img.jpg') }}"
+                 alt="{{ character.name }}">
+            <div>
+                <p>{{ character.name }}</p>
+            </div>
+        </article>
+    </a>
+{% else %}
+    <p>Aucun character trouvé.</p>
+{% endfor %}
