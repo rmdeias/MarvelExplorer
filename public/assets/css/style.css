@@ -52,14 +52,14 @@ h1 {
     width: 300px;
 }
 
-.comic-list , .characters-list {
+.comic-list , .characters-list , .serie-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
     padding: 20px;
 }
 
-.comic-card , .character-card {
+.comic-card , .character-card, .serie-card {
     position: relative;
     background: black;
     box-shadow: 0 2px 6px rgb(255, 255, 255);
@@ -70,11 +70,11 @@ h1 {
     text-align: center;
 }
 
-.comic-card img , .character-card img {
+.comic-card img , .character-card img , .serie-card img {
     width: 100%;
 }
 
-.comic-card p {
+.comic-card p, .character-card p,.serie-card-card p {
     font-size: 13px;
     color: white;
     font-weight: bold;
