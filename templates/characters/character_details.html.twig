@@ -22,7 +22,7 @@
             {% for serie in character.series %}
                 <a href="/series/{{ serie.marvelId }}-{{ serie.title |slug|lower }}">
                     <div class="character-card">
-                        <img src="{{ serie.thumbnail ?: asset('assets/images/character-no-img.jpg') }}"
+                        <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}"
                              alt="{{ serie.title }}">
                         <h3>{{ serie.title }}</h3>
                     </div>
