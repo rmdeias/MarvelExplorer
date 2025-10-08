@@ -1,0 +1,14 @@
+{% for serie in series %}
+
+    <a href="/series/{{ serie.marvelId }}-{{ serie.title |slug|lower }}">
+        <article class="serie-card">
+            <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ serie.title }}">
+            <div>
+                <p>{{ serie.title }}</p>
+            </div>
+        </article>
+    </a>
+
+{% else %}
+    <p>Aucun serie trouvé.</p>
+{% endfor %}
