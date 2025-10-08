@@ -16,7 +16,7 @@
                 <p>pages: {{ comic.pageCount }}</p>
                 <p>date: {{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
 
-                {% if comic.creators is not empty %}
+                {% if comic.creators is not empty and  comic.creators|length > 0 %}
                     <ul class="creators">
                         {% for creator in comic.creators %}
                             <li>
@@ -43,11 +43,12 @@
 
         </div>
 
-        {% if comic.serie is defined %}
+        {% if comic.serie is not empty %}
             <h2>Serie</h2>
-            <a href="/series/{{ comic.serie.marvelId }}-{{ comic.serie.title |slug|lower}}">
+            <a href="/series/{{ comic.serie.marvelId }}-{{ comic.serie.title |slug|lower }}">
                 <div class="comic-card">
-                    <img src="{{ comic.serie.thumbnail ?: asset('assets/images/comic-no-img.jpg') }}" alt="{{ comic.serie.title }}">
+                    <img src="{{ comic.serie.thumbnail ?: asset('assets/images/comic-no-img.jpg') }}"
+                         alt="{{ comic.serie.title }}">
                     <h3>{{ comic.serie.title }}</h3>
                     <p>{{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
                 </div>

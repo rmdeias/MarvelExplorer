@@ -17,7 +17,7 @@
 
         </div>
 
-        {% if character.series is defined and  character.series|length > 0 %}
+        {% if character.series is not empty %}
             <h2>Serie</h2>
             {% for serie in character.series %}
                 <a href="/series/{{ serie.marvelId }}-{{ serie.title |slug|lower }}">
