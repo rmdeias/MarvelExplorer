@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use App\DataProvider\SerieDataProvider;
 use App\Repository\SerieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,6 +26,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Get(
             uriTemplate: '/series/{id}',
             uriVariables: ['id' => 'marvelId']
+        ),
+        new GetCollection(
+            name: 'searchSeriesByTitle',
+            uriTemplate: '/searchSeriesByTitle',
+            provider: SerieDataProvider::class,
+            paginationEnabled: false
         ),
     ],
 )]

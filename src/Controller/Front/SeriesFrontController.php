@@ -22,7 +22,7 @@ final class SeriesFrontController extends AbstractController
      * @param HttpClientInterface $client Http client used to call internal API endpoints
      */
     public function __construct(
-        private readonly HttpClientInterface $client,
+        private readonly HttpClientInterface   $client,
         private readonly ExtractCreatorService $extractCreatorsService)
     {
     }
@@ -43,13 +43,59 @@ final class SeriesFrontController extends AbstractController
      * @throws ClientExceptionInterface
      */
     #[Route('/series', name: 'front_series')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        return $this->render('series/index.html.twig', []);
+        $baseUrl = $request->getSchemeAndHttpHost();
+
+        $response = $this->client->request('GET', $baseUrl . '/api/series');
+        $data = $response->toArray();
+
+        $series = $data['member'] ?? [];
+        usort($series, fn($a, $b) => strnatcasecmp($a['title'], $b['title']));
+
+        return $this->render('series/index.html.twig', [
+            'series' => $series,
+        ]);
     }
 
     /**
-     * Comic page details.
+     * Searches for series by title.
+     *
+     * Reads the 'title' query parameter from the request, calls the internal API
+     * endpoint '/api/searchComicsByTitle', and renders the results in the
+     * 'series/_list.html.twig' template.
+     * If the title is empty, redirects to the main series page.
+     *
+     * @param Request $request HTTP request object
+     * @return Response Rendered HTML response with search results
+     *
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    #[Route('/series/search', name: 'front_series_search', methods: ['GET'])]
+    public function search(Request $request): Response
+    {
+        $title = $request->query->get('title', '');
+        if (empty($title)) {
+            return $this->redirectToRoute('front_series');
+        }
+
+        $baseUrl = $request->getSchemeAndHttpHost();
+        $response = $this->client->request('GET', $baseUrl . '/api/searchSeriesByTitle?title=' . urlencode($title));
+
+        $seriesData = $response->toArray();
+
+
+        return $this->render('series/_list.html.twig', [
+            'series' => $seriesData['member'] ?? [],
+        ]);
+    }
+
+    /**
+     * Serie page details.
      *
      * Reads the 'id' query parameter from the request, calls the internal API
      * endpoint '/api/series/{id}-{slug}', and renders the results in the
@@ -78,7 +124,6 @@ final class SeriesFrontController extends AbstractController
         $serieDetailsData = $response->toArray();
 
         $serieDetailsData = $this->extractCreatorsService->enrichCreators($serieDetailsData, $baseUrl);
-
 
 
         return $this->render('series/serie_details.html.twig', [

@@ -1,6 +1,53 @@
 {% extends 'base.html.twig' %}
 
-
 {% block body %}
+    <input type="text" id="search-bar" placeholder="Rechercher un serie..."/>
+
+    <section class="serie-list" id="serie-list">
+        {% include 'series/_list.html.twig' with { series: series } %}
+    </section>
+    {#
+    <div class="pagination">
+        {% if currentPage > 1 %}
+            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage - 1})) }}">« Previous</a>
+        {% endif %}
+
+        {% for p in startPage..endPage %}
+            {% if p == currentPage %}
+                <span class="current">{{ p }}</span>
+            {% else %}
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': p})) }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if currentPage < totalPages %}
+            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage + 1})) }}">Next »</a>
+        {% endif %}
+    </div>
+    #}
+    <script>
+        const searchInput = document.getElementById('search-bar');
+        const serieList = document.getElementById('serie-list');
+
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value.trim();
+
+            if (query === '') {
+                // Revenir à la liste initiale sans faire de fetch
+                serieList.innerHTML = `{% include 'series/_list.html.twig' with { series: series } %}`;
+                return;
+            }
+
+            fetch(`/series/search?title=${encodeURIComponent(query)}`)
+                .then(res => res.text())
+                .then(html => {
+                    serieList.innerHTML = html;
+                })
+                .catch(err => {
+                    console.error(err);
+                    serieList.innerHTML = '<p>Erreur lors de la récupération des series.</p>';
+                });
+        });
+    </script>
 
 {% endblock %}
