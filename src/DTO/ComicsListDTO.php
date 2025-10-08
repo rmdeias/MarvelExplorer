@@ -11,11 +11,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * for API responses or front-end rendering.
  *
  * This DTO contains:
- * - id : the comic's id from db
+ * - marvelId : the comic's marvelId
  * - title: the comic's title
  * - date: the release or publication date
  * - thumbnail: URL or path to the comic's thumbnail image
- * - slug: the comic's title for url
  *
  * DTOs are simple objects meant to transfer data without any business logic.
  */
