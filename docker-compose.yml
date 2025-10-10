@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+    # --- PHP + Symfony ---
+    php:
+        build:
+            context: .
+            dockerfile: docker/php/Dockerfile
+        container_name: marvel_php
+        volumes:
+            - ./:/var/www/html
+        depends_on:
+            - db
+            - elasticsearch
+        environment:
+            DATABASE_URL: "mysql://remi:password@db:3306/MarvelExplorer?serverVersion=8.0"
+            ELASTICSEARCH_HOST: "http://elasticsearch:9200"
+        expose:
+            - "9000"
+
+    # --- Nginx ---
+    nginx:
+        image: nginx:latest
+        container_name: marvel_nginx
+        ports:
+            - "8000:80"
+        volumes:
+            - ./:/var/www/html
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - php
+
+    # --- MySQL ---
+    db:
+        image: mysql:8.0
+        container_name: marvel_db
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: MarvelExplorer
+            MYSQL_USER: remi
+            MYSQL_PASSWORD: password
+        ports:
+            - "3307:3306" # <-- port externe 3307 pour éviter conflit local
+        volumes:
+            - db_data:/var/lib/mysql
+
+    # --- Elasticsearch ---
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+        container_name: marvel_elasticsearch
+        environment:
+            - discovery.type=single-node
+            - xpack.security.enabled=false
+            - ES_JAVA_OPTS=-Xms1g -Xmx1g
+        ports:
+            - "9200:9200"
+        volumes:
+            - es_data:/usr/share/elasticsearch/data
+
+volumes:
+    db_data:
+    es_data:
