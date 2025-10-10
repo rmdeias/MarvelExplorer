@@ -24,6 +24,14 @@ services:
             $publicKey: '%env(MARVEL_PUBLIC_KEY)%'
             $privateKey: '%env(MARVEL_PRIVATE_KEY)%'
 
+    App\Service\ElasticClientService:
+        arguments:
+            $elasticHost: '%env(ELASTICSEARCH_HOST)%'
+
+    App\Service\ElasticIndexService:
+        arguments:
+            $elasticClientService: '@App\Service\ElasticClientService'
+
     App\DataFixtures\:
         resource: '../src/DataFixtures'
         tags: [ 'doctrine.fixture.orm' ]
