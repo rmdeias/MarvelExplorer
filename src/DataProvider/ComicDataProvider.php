@@ -4,63 +4,82 @@ namespace App\DataProvider;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use App\DTO\ComicsListDTO;
 use App\Repository\ComicRepository;
+use App\Service\ElasticSearchServices\ElasticSearchService;
 
 /**
- * Class ComicDataProvider
+ * ComicDataProvider
  *
  * Custom data provider for the Comic entity.
  *
- * This provider handles different operations:
- * - "topRecentComics": returns the top 10 most recent comics
- * - "searchComicsByTitle": searches comics by title and applies natural sorting
- * - Default: returns all comics
- *
- * It delegates database queries to the ComicRepository.
+ * Handles different operations:
+ * - topRecentComics: returns the top 10 most recent comics
+ * - searchComicsByTitle: searches comics by title using Elasticsearch
+ * - default: returns all comics
  */
 final readonly class ComicDataProvider implements ProviderInterface
 {
     /**
-     * ComicDataProvider constructor.
-     *
-     * @param ComicRepository $comicRepository Repository used to fetch comic data
+     * @param ComicRepository $comicRepository Repository for fetching comic data
+     * @param ElasticSearchService $elasticSearchService Service for searching comics in Elasticsearch
      */
-    public function __construct(private ComicRepository $comicRepository)
-    {
+    public function __construct(
+        private ComicRepository $comicRepository,
+        private ElasticSearchService $elasticSearchService
+    ) {
     }
 
     /**
-     * Provides comic data based on the operation name.
+     * Maps an array of data to a ComicsListDTO.
      *
-     * @param Operation $operation The API Platform operation being executed
-     * @param array $uriVariables Variables extracted from the URI
-     * @param array $context Context passed by API Platform (e.g., the current request)
+     * @param array $source
+     * @return ComicsListDTO
+     * @throws \Exception
+     */
+    protected function mapToComicsDTO(array $source): ComicsListDTO
+    {
+        return new ComicsListDTO(
+            (int) ($source['marvelId'] ?? 0),
+            $source['title'] ?? '',
+            isset($source['date']) ? new \DateTimeImmutable($source['date']) : null,
+            $source['thumbnail'] ?? ''
+        );
+    }
+
+    /**
+     * Provides comic data depending on the operation name.
      *
-     * @return object|array|null Returns an array of comics, a single comic object, or null
-     *
-     * @throws \Exception Can throw exceptions if repository methods fail
+     * @param Operation $operation The API Platform operation
+     * @param array $uriVariables URI variables
+     * @param array $context Additional context
+     * @return object|array|null
+     * @throws \Exception
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        // Top recent comics
         if ($operation->getName() === 'topRecentComics') {
             return $this->comicRepository->findTopRecentComics();
         }
 
-        // Search comics by title
         if ($operation->getName() === 'searchComicsByTitle') {
             $request = $context['request'] ?? null;
             $title = $request?->query->get('title', '');
 
-            $comics = $this->comicRepository->searchComicsByTitle($title);
+            $comics = $this->elasticSearchService->search(
+                'comics',
+                'title',
+                $title,
+                ['variant', 'paperback', 'hardcover'],
+                500,
+                fn(array $source) => $this->mapToComicsDTO($source)
+            );
 
-            // Natural sort by title
             usort($comics, fn($a, $b) => strnatcasecmp($a->title, $b->title));
 
             return $comics;
         }
 
-        // Default: return all comics
         return $this->comicRepository->findAll();
     }
 }
