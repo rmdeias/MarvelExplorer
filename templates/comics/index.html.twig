@@ -32,7 +32,7 @@
         searchInput.addEventListener('input', function () {
             const query = searchInput.value.trim();
 
-            if (query === '') {
+            if (query === ''|| query.length < 3) {
                 // Revenir à la liste initiale sans faire de fetch
                 comicList.innerHTML = `{% include 'comics/_list.html.twig' with { comics: comics } %}`;
                 return;
