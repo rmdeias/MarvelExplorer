@@ -1,0 +1,15 @@
+{% for comic in comics %}
+    {% if  'variant' not in comic.title|lower and 'paperback' not in comic.title|lower  and 'hardcover' not in comic.title|lower %}
+        <a href="/comics/{{ comic.marvelId }}-{{ comic.title |slug|lower }}">
+            <article class="comic-card">
+                <img src="{{ comic.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ comic.title }}">
+                <div>
+                    <p>{{ comic.title }}</p>
+                    <p>{{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
+                </div>
+            </article>
+        </a>
+    {% endif %}
+{% else %}
+    <p>Aucun comic trouvé.</p>
+{% endfor %}
