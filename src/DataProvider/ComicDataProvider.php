@@ -25,9 +25,10 @@ final readonly class ComicDataProvider implements ProviderInterface
      * @param ElasticSearchService $elasticSearchService Service for searching comics in Elasticsearch
      */
     public function __construct(
-        private ComicRepository $comicRepository,
+        private ComicRepository      $comicRepository,
         private ElasticSearchService $elasticSearchService
-    ) {
+    )
+    {
     }
 
     /**
@@ -40,7 +41,7 @@ final readonly class ComicDataProvider implements ProviderInterface
     protected function mapToComicsDTO(array $source): ComicsListDTO
     {
         return new ComicsListDTO(
-            (int) ($source['marvelId'] ?? 0),
+            (int)($source['marvelId'] ?? 0),
             $source['title'] ?? '',
             isset($source['date']) ? new \DateTimeImmutable($source['date']) : null,
             $source['thumbnail'] ?? ''
@@ -60,6 +61,22 @@ final readonly class ComicDataProvider implements ProviderInterface
     {
         if ($operation->getName() === 'topRecentComics') {
             return $this->comicRepository->findTopRecentComics();
+        }
+
+
+        if ($operation->getName() === 'comics') {
+            $page = $context['filters']['page'] ?? 1;
+            $itemsPerPage = $context['filters']['itemsPerPage'] ?? 100;
+
+            // Récupération des comics filtrés côté repository avec pagination
+            $comics = $this->comicRepository->findFilteredComics($page, $itemsPerPage);
+            $totalItems = $this->comicRepository->countFilteredComics()['totalItems'];
+
+            return
+                ['totalItems' => $totalItems,
+                    'comics' => $comics,
+                ];
+
         }
 
         if ($operation->getName() === 'searchComicsByTitle') {

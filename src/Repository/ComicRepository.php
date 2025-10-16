@@ -68,41 +68,51 @@ class ComicRepository extends ServiceEntityRepository
     }
 
     /**
-     * Searches comics by title.
+     * Returns the total number of comics excluding variants, paperback, and hardcover editions.
      *
+     * @return array{totalItems: int} The total number of filtered comics
+     */
+    public function countFilteredComics(): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb->select('count(c.marvelId)')
+            ->where('c.title NOT LIKE :variant')
+            ->andWhere('c.title NOT LIKE :paperback')
+            ->andWhere('c.title NOT LIKE :hardcover')
+            ->setParameter('variant', '%variant%')
+            ->setParameter('paperback', '%paperback%')
+            ->setParameter('hardcover', '%hardcover%');
+        $total = (int)$qb->getQuery()->getSingleScalarResult();
+        return ['totalItems' => $total,];
+    }
+
+    /**
      * Excludes variants, paperback, and hardcover editions.
      * Returns an array of ComicsListDTO objects.
      *
-     * @param string $title The title string to search for
      * @return ComicsListDTO[] Array of DTOs containing marvelId, title, date, and thumbnail
      */
-    public function searchComicsByTitle(string $title): array
+    public function findFilteredComics(int $page, int $itemsPerPage): array
     {
         $qb = $this->createQueryBuilder('c');
-
         $qb->select('c.marvelId', 'c.title', 'c.date', 'c.thumbnail')
-            ->where('c.title LIKE :search')
-            ->andWhere('c.title NOT LIKE :variant')
+            ->where('c.title NOT LIKE :variant')
             ->andWhere('c.title NOT LIKE :paperback')
             ->andWhere('c.title NOT LIKE :hardcover')
-            ->setParameter('search', '%' . $title . '%')
             ->setParameter('variant', '%variant%')
             ->setParameter('paperback', '%paperback%')
             ->setParameter('hardcover', '%hardcover%')
             ->orderBy('c.title', 'ASC')
-            ->setMaxResults(500);
-
+            ->setFirstResult(($page - 1) * $itemsPerPage)->setMaxResults($itemsPerPage);
         $results = $qb->getQuery()->getResult();
-
         return array_map(fn($r) => new ComicsListDTO(
             $r['marvelId'],
             $r['title'],
             $r['date'] ?? null, // permet null si la date n’existe pas
             $r['thumbnail']
         ), $results);
+
     }
-
-
     // Uncommented sample methods for reference
     /*
     public function findByExampleField($value): array

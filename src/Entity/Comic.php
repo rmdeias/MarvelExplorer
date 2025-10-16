@@ -27,7 +27,9 @@ use Doctrine\ORM\Mapping as ORM;
     order: ['title' => 'ASC'],      // tri alphabétique par défaut
     operations: [
         new GetCollection(
-            uriTemplate: '/comics'
+            name: 'comics',
+            uriTemplate: '/comics',
+            provider: ComicDataProvider::class
         ),
         new GetCollection(
             name: 'searchComicsByTitle',
@@ -44,6 +46,7 @@ use Doctrine\ORM\Mapping as ORM;
             uriTemplate: '/comics/{id}',
             uriVariables: ['id' => 'marvelId']
         ),
+
     ],
 )]
 #[ApiFilter(OrderFilter::class, properties: ['title'])]
@@ -55,11 +58,11 @@ class Comic
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
-    #[Groups(['comic:read', 'serie:read'] )]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?int $marvelId = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['comic:read','serie:read'])]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -75,11 +78,11 @@ class Comic
     private ?string $modified = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['comic:read','serie:read'])]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?string $thumbnail = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[Groups(['comic:read','serie:read'])]
+    #[Groups(['comic:read', 'serie:read'])]
     private ?\DateTimeInterface $date = null;
 
 
