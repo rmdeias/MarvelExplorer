@@ -63,13 +63,14 @@ final readonly class ComicDataProvider implements ProviderInterface
             return $this->comicRepository->findTopRecentComics();
         }
 
-
         if ($operation->getName() === 'comics') {
             $page = $context['filters']['page'] ?? 1;
             $itemsPerPage = $context['filters']['itemsPerPage'] ?? 100;
 
-            // Récupération des comics filtrés côté repository avec pagination
+            /// Retrieving filtered comics from the repository side with pagination and sort them in alphabetical order
             $comics = $this->comicRepository->findFilteredComics($page, $itemsPerPage);
+            usort($comics, fn($a, $b) => strnatcasecmp($a->title, $b->title));
+
             $totalItems = $this->comicRepository->countFilteredComics()['totalItems'];
 
             return
