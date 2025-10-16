@@ -4,49 +4,63 @@
     <input type="text" id="search-bar" placeholder="Rechercher un serie..."/>
 
     <section class="serie-list" id="serie-list">
-        {% include 'series/_list.html.twig' with { series: series } %}
+        {% include 'series/_list.html.twig' with {
+            series: series,
+            currentPage: currentPage,
+            startPage: startPage,
+            endPage: endPage,
+            totalPages: totalPages,
+            routeName: routeName|default('front_series'),
+            searchTitle: ''
+        } %}
     </section>
-    {#
-    <div class="pagination">
-        {% if currentPage > 1 %}
-            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage - 1})) }}">« Previous</a>
-        {% endif %}
 
-        {% for p in startPage..endPage %}
-            {% if p == currentPage %}
-                <span class="current">{{ p }}</span>
-            {% else %}
-                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': p})) }}">{{ p }}</a>
-            {% endif %}
-        {% endfor %}
-
-        {% if currentPage < totalPages %}
-            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage + 1})) }}">Next »</a>
-        {% endif %}
-    </div>
-    #}
     <script>
         const searchInput = document.getElementById('search-bar');
         const serieList = document.getElementById('serie-list');
 
-        searchInput.addEventListener('input', function () {
-            const query = searchInput.value.trim();
+        let currentQuery = '';
+        let currentPage = 1;
 
-            if (query === '') {
-                // Revenir à la liste initiale sans faire de fetch
-                serieList.innerHTML = `{% include 'series/_list.html.twig' with { series: series } %}`;
-                return;
-            }
+        function loadComics(title, page = 1) {
+            currentQuery = title;
+            currentPage = page;
 
-            fetch(`/series/search?title=${encodeURIComponent(query)}`)
+            fetch(`/series/search?title=${encodeURIComponent(title)}&page=${page}`)
                 .then(res => res.text())
                 .then(html => {
                     serieList.innerHTML = html;
+
+                    // Pagination AJAX
+                    serieList.querySelectorAll('.pagination a').forEach(link => {
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            const newPage = parseInt(this.dataset.page);
+                            loadComics(currentQuery, newPage);
+                        });
+                    });
                 })
                 .catch(err => {
                     console.error(err);
                     serieList.innerHTML = '<p>Erreur lors de la récupération des series.</p>';
                 });
+        }
+
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value.trim();
+            if (query.length < 3) {
+                serieList.innerHTML = `{% include 'series/_list.html.twig' with {
+                    series: series,
+                    currentPage: currentPage,
+                    startPage: startPage,
+                    endPage: endPage,
+                    totalPages: totalPages,
+                    routeName: routeName|default('front_series'),
+                    searchTitle: ''
+                } %}`;
+                return;
+            }
+            loadComics(query, 1);
         });
     </script>
 
