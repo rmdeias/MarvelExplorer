@@ -46,15 +46,32 @@ final class SeriesFrontController extends AbstractController
     public function index(Request $request): Response
     {
         $baseUrl = $request->getSchemeAndHttpHost();
+        $page = max(1, (int)$request->query->get('page', 1));
 
-        $response = $this->client->request('GET', $baseUrl . '/api/series');
-        $data = $response->toArray();
+        $response = $this->client->request('GET', $baseUrl . '/api/series', [
+            'query' => ['page' => $page]
+        ]);
+        $datas = $response->toArray();
+        $totalItems = $datas['member'][0];
+        $series = $datas['member'][1];
 
-        $series = $data['member'] ?? [];
-        usort($series, fn($a, $b) => strnatcasecmp($a['title'], $b['title']));
+        $totalPages = ceil($totalItems / 100);
+
+        if ($page > $totalPages) {
+            return $this->redirectToRoute('front_series');
+        }
+
+        $pageRange = 10;
+        $startPage = max(1, $page - intval($pageRange / 2));
+        $endPage = min($totalPages, $startPage + $pageRange - 1);
+
 
         return $this->render('series/index.html.twig', [
             'series' => $series,
+            'currentPage' => $page,
+            'startPage' => $startPage,
+            'endPage' => $endPage,
+            'totalPages' => $totalPages,
         ]);
     }
 
@@ -83,14 +100,38 @@ final class SeriesFrontController extends AbstractController
             return $this->redirectToRoute('front_series');
         }
 
+        $page = max(1, (int)$request->query->get('page', 1));
         $baseUrl = $request->getSchemeAndHttpHost();
-        $response = $this->client->request('GET', $baseUrl . '/api/searchSeriesByTitle?title=' . urlencode($title));
+        $response = $this->client->request('GET', $baseUrl . '/api/searchSeriesByTitle?title=' . urlencode($title), [
+            'query' => [
+                'title' => urlencode($title),
+                'page' => $page,
+            ]
+        ]);
 
-        $seriesData = $response->toArray();
+        $data = $response->toArray();
+        $seriesResearch = $data['member'] ?? [];
 
+        //Clip results for the current page
+        $perPage = 100;
+        $offset = ($page - 1) * $perPage;
+        $series = array_slice($seriesResearch, $offset, $perPage);
+
+        $totalItems = count($seriesResearch);
+
+        $totalPages = ceil($totalItems / $perPage);
+        $pageRange = 10;
+        $startPage = max(1, $page - intval($pageRange / 2));
+        $endPage = min($totalPages, $startPage + $pageRange - 1);
 
         return $this->render('series/_list.html.twig', [
-            'series' => $seriesData['member'] ?? [],
+            'series' => $series,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'startPage' => $startPage,
+            'endPage' => $endPage,
+            'routeName' => 'front_comics_search',
+            'searchTitle' => $title,
         ]);
     }
 

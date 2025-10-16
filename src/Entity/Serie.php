@@ -21,11 +21,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => ['serie:read']],
     operations: [
         new GetCollection(
-            uriTemplate: '/series'
-        ),
-        new Get(
-            uriTemplate: '/series/{id}',
-            uriVariables: ['id' => 'marvelId']
+            name: 'series',
+            uriTemplate: '/series',
+            provider: SerieDataProvider::class,
         ),
         new GetCollection(
             name: 'searchSeriesByTitle',
@@ -33,6 +31,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
             provider: SerieDataProvider::class,
             paginationEnabled: false
         ),
+        new Get(
+            uriTemplate: '/series/{id}',
+            uriVariables: ['id' => 'marvelId']
+        ),
+
     ],
 )]
 class Serie

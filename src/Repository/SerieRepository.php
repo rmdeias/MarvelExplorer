@@ -8,6 +8,12 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * Class SerieRepository
+ *
+ * Repository for the Serie entity.
+ *
+ * Provides methods to fetch series from the database with custom queries.
+ *
  * @extends ServiceEntityRepository<Serie>
  */
 class SerieRepository extends ServiceEntityRepository
@@ -17,32 +23,50 @@ class SerieRepository extends ServiceEntityRepository
         parent::__construct($registry, Serie::class);
     }
 
-
     /**
-     * Searches series by title.
+     * Returns the total number of series excluding variants, paperback, and hardcover editions.
      *
-     * Returns an array of SeriesListDTO objects.
-     *
-     * @param string $title The title string to search for
-     * @return SeriesListDTO[] Array of DTOs containing marvelId, title, date, and thumbnail
+     * @return array{totalItems: int} The total number of filtered series
      */
-    public function searchSeriesByTitle(string $title): array
+    public function countFilteredSeries(): array
     {
         $qb = $this->createQueryBuilder('c');
+        $qb->select('count(c.marvelId)')
+            ->where('c.title NOT LIKE :variant')
+            ->andWhere('c.title NOT LIKE :paperback')
+            ->andWhere('c.title NOT LIKE :hardcover')
+            ->setParameter('variant', '%variant%')
+            ->setParameter('paperback', '%paperback%')
+            ->setParameter('hardcover', '%hardcover%');
+        $total = (int)$qb->getQuery()->getSingleScalarResult();
+        return ['totalItems' => $total,];
+    }
 
+    /**
+     * Excludes variants, paperback, and hardcover editions.
+     * Returns an array of SeriesListDTO objects.
+     *
+     * @return SeriesListDTO[] Array of DTOs containing marvelId, title, date, and thumbnail
+     */
+    public function findFilteredSeries(int $page, int $itemsPerPage): array
+    {
+        $qb = $this->createQueryBuilder('c');
         $qb->select('c.marvelId', 'c.title', 'c.thumbnail')
-            ->where('c.title LIKE :search')
-            ->setParameter('search', '%' . $title . '%')
+            ->where('c.title NOT LIKE :variant')
+            ->andWhere('c.title NOT LIKE :paperback')
+            ->andWhere('c.title NOT LIKE :hardcover')
+            ->setParameter('variant', '%variant%')
+            ->setParameter('paperback', '%paperback%')
+            ->setParameter('hardcover', '%hardcover%')
             ->orderBy('c.title', 'ASC')
-            ->setMaxResults(500);
-
+            ->setFirstResult(($page - 1) * $itemsPerPage)->setMaxResults($itemsPerPage);
         $results = $qb->getQuery()->getResult();
-
         return array_map(fn($r) => new SeriesListDTO(
             $r['marvelId'],
             $r['title'],
             $r['thumbnail']
         ), $results);
+
     }
 
     //    /**
