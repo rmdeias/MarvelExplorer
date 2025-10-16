@@ -178,6 +178,61 @@ h1 {
     margin: 0.5rem 0 0;
 }
 
+.pagination {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(20, 20, 20, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    z-index: 1000;
+    backdrop-filter: blur(6px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pagination a,
+.pagination span.current {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 8px 14px;
+    transition: all 0.2s ease;
+}
+
+.pagination a {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.pagination a:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.pagination span.current {
+    background: #ff4757;
+    font-weight: 700;
+    cursor: default;
+}
+
+@media (max-width: 600px) {
+    .pagination {
+        font-size: 0.9rem;
+        gap: 4px;
+        padding: 10px 0;
+    }
+
+    .pagination a,
+    .pagination span.current {
+        padding: 6px 10px;
+    }
+}
+
+
 /* Responsive mobile */
 @media (max-width: 768px) {
     .comic-main {
