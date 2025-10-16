@@ -21,8 +21,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * Controller responsible for handling frontend comic pages.
  *
  * This controller provides:
- * - Listing of recent comics (top comics)
+ * - Listing  comics
  * - Searching comics by title
+ * - Listing  comics by marvelId
  *
  * It communicates with the internal API using HttpClientInterface
  * to fetch comic data and passes it to Twig templates for rendering.
@@ -43,46 +44,58 @@ final class ComicsFrontController extends AbstractController
     {
     }
 
-
+    /**
+     * Displays a paginated list of comics.
+     *
+     * This controller fetches comics from the API Platform endpoint `/api/comics`
+     * using pagination (100 items per page). It also retrieves the total number of
+     * comics via the `/api/countFilteredComics` endpoint to calculate the number of pages.
+     *
+     * If the current page exceeds the total number of pages, the user is redirected
+     * to the first page. The pagination bar displays up to 10 pages at a time.
+     *
+     * @param Request $request The current HTTP request (used to get the page number)
+     *
+     * @return Response The rendered HTML response containing the comics list and pagination
+     *
+     * @throws TransportExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     *
+     */
     #[Route('/comics', name: 'front_comics')]
     public function allComics(Request $request): Response
     {
         $baseUrl = $request->getSchemeAndHttpHost();
         $page = max(1, (int)$request->query->get('page', 1));
-        $perPage = 20; // nombre de comics par page
 
+        // Récupère la page N (100 comics filtrés par page via DataProvider)
         $response = $this->client->request('GET', $baseUrl . '/api/comics', [
-            'query' => [
-                'page' => $page,
-                'itemsPerPage' => $perPage,
-            ]
+            'query' => ['page' => $page]
         ]);
 
-        $data = $response->toArray();
-        $comics = $data['member'] ?? [];
+        $datas = $response->toArray()['member'] ?? [];
+        $totalItems = $datas[0];
+        $comics = $datas[1];
 
-        usort($comics, fn($a, $b) => strnatcasecmp($a['title'], $b['title']));
-        $comics = array_filter($data['member'] ?? [], function ($comic) {
-            $title = strtolower($comic['title'] ?? '');
-            return stripos($title, 'variant') === false
-                && stripos($title, 'paperback') === false
-                && stripos($title, 'hardcover') === false;
-        });
+        $totalPages = ceil($totalItems / 100);
 
-        $totalItems = $data['totalItems'] ?? count($comics);
-        $totalPages = ceil($totalItems / $perPage);
+        if ($page > $totalPages) {
+            return $this->redirectToRoute('front_comics');
+        }
 
-        // Intervalle de pages visibles (par exemple par 10)
         $pageRange = 10;
         $startPage = max(1, $page - intval($pageRange / 2));
         $endPage = min($totalPages, $startPage + $pageRange - 1);
 
+
         return $this->render('comics/index.html.twig', [
             'comics' => $comics,
             'currentPage' => $page,
-            'totalPages' => $totalPages,
             'startPage' => $startPage,
             'endPage' => $endPage,
+            'totalPages' => $totalPages,
         ]);
     }
 
@@ -112,14 +125,41 @@ final class ComicsFrontController extends AbstractController
             return $this->redirectToRoute('front_comics');
         }
 
+        $page = max(1, (int)$request->query->get('page', 1));
+        $perPage = 100;
+
         $baseUrl = $request->getSchemeAndHttpHost();
-        $response = $this->client->request('GET', $baseUrl . '/api/searchComicsByTitle?title=' . urlencode($title));
 
-        $comicsData = $response->toArray();
+        // Appel API qui renvoie tous les résultats correspondants à la recherche
+        $response = $this->client->request('GET', $baseUrl . '/api/searchComicsByTitle', [
+            'query' => [
+                'title' => $title,
+                'page' => 1,        // on récupère tout pour découper côté PHP
+            ]
+        ]);
 
+        $data = $response->toArray();
+        $comicsResearch = $data['member'] ?? [];
+
+        // Découper les résultats pour la page actuelle
+        $offset = ($page - 1) * $perPage;
+        $comics = array_slice($comicsResearch, $offset, $perPage);
+
+        $totalItems = count($comicsResearch);
+        $totalPages = ceil($totalItems / $perPage);
+
+        $pageRange = 10;
+        $startPage = max(1, $page - intval($pageRange / 2));
+        $endPage = min($totalPages, $startPage + $pageRange - 1);
 
         return $this->render('comics/_list.html.twig', [
-            'comics' => $comicsData['member'] ?? [],
+            'comics' => $comics,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'startPage' => $startPage,
+            'endPage' => $endPage,
+            'routeName' => 'front_comics_search',
+            'searchTitle' => $title,
         ]);
     }
 
