@@ -84,7 +84,7 @@ final readonly class ElasticSearchService
 
         // Prepare exclusion filters
         $mustNot = array_map(
-            fn(string $word): array => ['wildcard' => [$field . '.keyword' => "*{$word}*"]],
+            fn(string $word): array => ['match' => [$field => $word]],
             $exclude
         );
 
@@ -97,7 +97,7 @@ final readonly class ElasticSearchService
                         [
                             'match' => [
                                 $field => [
-                                    'query' => $query,
+                                    'query' => strtolower($query),
                                     'fuzziness' => 'AUTO',
                                     'operator' => 'and',
                                 ],
