@@ -15,6 +15,7 @@ use App\Service\ElasticSearchServices\ElasticSearchService;
  *
  * Handles different operations:
  * - topRecentComics: returns the top 10 most recent comics
+ * - comics: returns sort and filtered comics
  * - searchComicsByTitle: searches comics by title using Elasticsearch
  * - default: returns all comics
  */
@@ -49,13 +50,15 @@ final readonly class ComicDataProvider implements ProviderInterface
     }
 
     /**
-     * Provides comic data depending on the operation name.
+     * Provides comic data based on the operation name.
      *
-     * @param Operation $operation The API Platform operation
-     * @param array $uriVariables URI variables
-     * @param array $context Additional context
-     * @return object|array|null
-     * @throws \Exception
+     * @param Operation $operation The API Platform operation being executed
+     * @param array $uriVariables Variables extracted from the URI
+     * @param array $context Context passed by API Platform (e.g., the current request)
+     *
+     * @return object|array|null Returns an array of comics, a single comic object, or null
+     *
+     * @throws \Exception Can throw exceptions if repository methods fail
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {

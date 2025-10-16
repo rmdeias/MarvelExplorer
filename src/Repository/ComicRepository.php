@@ -14,10 +14,6 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * Provides methods to fetch comics from the database with custom queries.
  *
- * Methods included:
- * - findTopRecentComics(): returns the top 20 most recent comics, excluding variants, paperbacks, and hardcovers.
- * - searchComicsByTitle(string $title): searches comics by title with the same exclusions and returns an array of ComicsListDTO objects.
- *
  * @extends ServiceEntityRepository<Comic>
  */
 class ComicRepository extends ServiceEntityRepository
@@ -33,7 +29,7 @@ class ComicRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the top 20 most recent comics.
+     * Returns the top 21 most recent comics.
      *
      * Excludes variants, paperback, and hardcover editions.
      *

@@ -126,28 +126,28 @@ final class ComicsFrontController extends AbstractController
         }
 
         $page = max(1, (int)$request->query->get('page', 1));
-        $perPage = 100;
+
 
         $baseUrl = $request->getSchemeAndHttpHost();
 
-        // Appel API qui renvoie tous les résultats correspondants à la recherche
         $response = $this->client->request('GET', $baseUrl . '/api/searchComicsByTitle', [
             'query' => [
-                'title' => $title,
-                'page' => 1,        // on récupère tout pour découper côté PHP
+                'title' => urlencode($title),
+                'page' => $page,
             ]
         ]);
 
         $data = $response->toArray();
         $comicsResearch = $data['member'] ?? [];
 
-        // Découper les résultats pour la page actuelle
+        //Clip results for the current page
+        $perPage = 100;
         $offset = ($page - 1) * $perPage;
         $comics = array_slice($comicsResearch, $offset, $perPage);
 
         $totalItems = count($comicsResearch);
-        $totalPages = ceil($totalItems / $perPage);
 
+        $totalPages = ceil($totalItems / $perPage);
         $pageRange = 10;
         $startPage = max(1, $page - intval($pageRange / 2));
         $endPage = min($totalPages, $startPage + $pageRange - 1);
