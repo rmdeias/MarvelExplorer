@@ -38,6 +38,8 @@ symfony console doctrine:fixtures:load --append --group=relations
 
 php -d memory_limit=512M bin/console app:index-comics
 
+php -d memory_limit=512M bin/console app:index-series
+
 
 
 
