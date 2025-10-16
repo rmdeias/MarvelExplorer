@@ -1,53 +1,67 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <input type="text" id="search-bar" placeholder="Rechercher un comic..."/>
+    <input type="text" id="search-bar" placeholder="Rechercher un comic..."
+           value="{{ app.request.query.get('title')|default('') }}"/>
 
     <section class="comic-list" id="comic-list">
-        {% include 'comics/_list.html.twig' with { comics: comics } %}
+        {% include 'comics/_list.html.twig' with {
+            comics: comics,
+            currentPage: currentPage,
+            startPage: startPage,
+            endPage: endPage,
+            totalPages: totalPages,
+            routeName: routeName|default('front_comics'),
+            searchTitle: ''
+        } %}
     </section>
-
-    <div class="pagination">
-        {% if currentPage > 1 %}
-            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage - 1})) }}">« Previous</a>
-        {% endif %}
-
-        {% for p in startPage..endPage %}
-            {% if p == currentPage %}
-                <span class="current">{{ p }}</span>
-            {% else %}
-                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': p})) }}">{{ p }}</a>
-            {% endif %}
-        {% endfor %}
-
-        {% if currentPage < totalPages %}
-            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage + 1})) }}">Next »</a>
-        {% endif %}
-    </div>
 
     <script>
         const searchInput = document.getElementById('search-bar');
         const comicList = document.getElementById('comic-list');
 
-        searchInput.addEventListener('input', function () {
-            const query = searchInput.value.trim();
+        let currentQuery = '';
+        let currentPage = 1;
 
-            if (query === ''|| query.length < 3) {
-                // Revenir à la liste initiale sans faire de fetch
-                comicList.innerHTML = `{% include 'comics/_list.html.twig' with { comics: comics } %}`;
-                return;
-            }
+        function loadComics(title, page = 1) {
+            currentQuery = title;
+            currentPage = page;
 
-            fetch(`/comics/search?title=${encodeURIComponent(query)}`)
+            fetch(`/comics/search?title=${encodeURIComponent(title)}&page=${page}`)
                 .then(res => res.text())
                 .then(html => {
                     comicList.innerHTML = html;
+
+                    // Pagination AJAX
+                    comicList.querySelectorAll('.pagination a').forEach(link => {
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            const newPage = parseInt(this.dataset.page);
+                            loadComics(currentQuery, newPage);
+                        });
+                    });
                 })
                 .catch(err => {
                     console.error(err);
                     comicList.innerHTML = '<p>Erreur lors de la récupération des comics.</p>';
                 });
+        }
+
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value.trim();
+            if (query.length < 3) {
+                comicList.innerHTML = `{% include 'comics/_list.html.twig' with {
+                    comics: comics,
+                    currentPage: currentPage,
+                    startPage: startPage,
+                    endPage: endPage,
+                    totalPages: totalPages,
+                    routeName: routeName|default('front_comics'),
+                    searchTitle: ''
+                } %}`;
+                return;
+            }
+            loadComics(query, 1);
         });
     </script>
-
 {% endblock %}
