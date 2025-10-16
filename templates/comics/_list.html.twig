@@ -1,15 +1,13 @@
 {% for comic in comics %}
-    {% if  'variant' not in comic.title|lower and 'paperback' not in comic.title|lower  and 'hardcover' not in comic.title|lower %}
-        <a href="/comics/{{ comic.marvelId }}-{{ comic.title |slug|lower }}">
-            <article class="comic-card">
-                <img src="{{ comic.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ comic.title }}">
-                <div>
-                    <p>{{ comic.title }}</p>
-                    <p>{{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
-                </div>
-            </article>
-        </a>
-    {% endif %}
+    <a href="/comics/{{ comic.marvelId }}-{{ comic.title |slug|lower }}">
+        <article class="comic-card">
+            <img src="{{ comic.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ comic.title }}">
+            <div>
+                <p>{{ comic.title }}</p>
+                <p>{{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
+            </div>
+        </article>
+    </a>
 {% else %}
     <p>Aucun comic trouvé.</p>
 {% endfor %}
@@ -20,22 +18,26 @@
         {% set queryParams = {'title': searchTitle} %}
     {% endif %}
 
-    {% if currentPage > 1 %}
-        <a href="{{ path(routeName, queryParams | merge({'page': currentPage - 1})) }}" data-page="{{ currentPage - 1 }}">« Previous</a>
-    {% endif %}
-
-    {% for p in startPage..endPage %}
-        {% if p == currentPage %}
-            <span class="current">{{ p }}</span>
-        {% else %}
-            <a href="{{ path(routeName, queryParams | merge({'page': p})) }}" data-page="{{ p }}">{{ p }}</a>
+    {% if totalPages > 0 %}
+        {% if currentPage > 1 %}
+            <a href="{{ path(routeName, queryParams | merge({'page': currentPage - 1})) }}"
+               data-page="{{ currentPage - 1 }}">« Previous</a>
         {% endif %}
-    {% endfor %}
 
-    {% if currentPage < totalPages %}
-        <a href="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}" data-page="{{ currentPage + 1 }}">Next »</a>
-    {% endif %}
-    {% if currentPage < totalPages %}
-        <a href="{{ path(routeName, queryParams | merge({'page':  totalPages})) }}" data-page="{{ totalPages }}">...Last</a>
+        {% for p in startPage..endPage %}
+            {% if p == currentPage %}
+                <span class="current">{{ p }}</span>
+            {% else %}
+                <a href="{{ path(routeName, queryParams | merge({'page': p})) }}" data-page="{{ p }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if currentPage < totalPages %}
+            <a href="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}"
+               data-page="{{ currentPage + 1 }}">Next »</a>
+        {% endif %}
+        {% if currentPage < totalPages %}
+            <a href="{{ path(routeName, queryParams | merge({'page':  totalPages})) }}" data-page="{{ totalPages }}">...Last</a>
+        {% endif %}
     {% endif %}
 </div>
