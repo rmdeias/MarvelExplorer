@@ -63,4 +63,33 @@ readonly class ElasticIndexService
             ],
         ]);
     }
+
+    /**
+     * Creates the "series" index in Elasticsearch with predefined mappings.
+     *
+     * If the index already exists, this method does nothing.
+     */
+    public function createSeriesIndex(): void
+    {
+        $client = $this->getClient();
+        $indexName = 'series';
+
+        $exists = $client->indices()->exists(['index' => $indexName]);
+        if ($exists->asBool()) {
+            return; // Index already exists
+        }
+
+        $client->indices()->create([
+            'index' => $indexName,
+            'body' => [
+                'mappings' => [
+                    'properties' => [
+                        'marvelId' => ['type' => 'integer'],
+                        'title'    => ['type' => 'text', 'fields' => ['keyword' => ['type' => 'keyword']]],
+                        'thumbnail'=> ['type' => 'keyword'],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
