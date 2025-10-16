@@ -13,7 +13,9 @@
             <div class="comic-info">
                 <h1>{{ comic.title }}</h1>
                 <p class="description">{{ comic.description }}</p>
-                <p>pages: {{ comic.pageCount }}</p>
+                {% if comic.pageCount > 0 %}
+                    <p>pages: {{ comic.pageCount }}</p>
+                {% endif %}
                 <p>date: {{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
 
                 {% if comic.creators is not empty and  comic.creators|length > 0 %}
