@@ -40,6 +40,8 @@ php -d memory_limit=512M bin/console app:index-comics
 
 php -d memory_limit=512M bin/console app:index-series
 
+php -d memory_limit=512M bin/console app:index-characters
+
 
 
 

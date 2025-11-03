@@ -92,4 +92,32 @@ readonly class ElasticIndexService
             ],
         ]);
     }
+    /**
+     * Creates the "characters" index in Elasticsearch with predefined mappings.
+     *
+     * If the index already exists, this method does nothing.
+     */
+    public function createCharactersIndex(): void
+    {
+        $client = $this->getClient();
+        $indexName = 'characters';
+
+        $exists = $client->indices()->exists(['index' => $indexName]);
+        if ($exists->asBool()) {
+            return; // Index already exists
+        }
+
+        $client->indices()->create([
+            'index' => $indexName,
+            'body' => [
+                'mappings' => [
+                    'properties' => [
+                        'marvelId' => ['type' => 'integer'],
+                        'name'    => ['type' => 'text', 'fields' => ['keyword' => ['type' => 'keyword']]],
+                        'thumbnail'=> ['type' => 'keyword'],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
