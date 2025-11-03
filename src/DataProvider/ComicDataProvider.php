@@ -62,13 +62,14 @@ final readonly class ComicDataProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
+        $itemsPerPage = $context['filters']['itemsPerPage'] ?? 100;
+
         if ($operation->getName() === 'topRecentComics') {
             return $this->comicRepository->findTopRecentComics();
         }
 
         if ($operation->getName() === 'comics') {
             $page = $context['filters']['page'] ?? 1;
-            $itemsPerPage = $context['filters']['itemsPerPage'] ?? 100;
 
             /// Retrieving filtered comics from the repository side with pagination and sort them in alphabetical order
             $comics = $this->comicRepository->findFilteredComics($page, $itemsPerPage);
@@ -77,7 +78,9 @@ final readonly class ComicDataProvider implements ProviderInterface
             $totalItems = $this->comicRepository->countFilteredComics()['totalItems'];
 
             return
-                ['totalItems' => $totalItems,
+                [
+                    'totalItems' => $totalItems,
+                    'itemsPerPage' => $itemsPerPage,
                     'comics' => $comics,
                 ];
 
@@ -98,7 +101,11 @@ final readonly class ComicDataProvider implements ProviderInterface
 
             usort($comics, fn($a, $b) => strnatcasecmp($a->title, $b->title));
 
-            return $comics;
+            return
+                [
+                    'itemsPerPage' => $itemsPerPage,
+                    'comics' => $comics,
+                ];
         }
 
         return $this->comicRepository->findAll();

@@ -61,9 +61,11 @@ final readonly class SerieDataProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
 
+        $itemsPerPage = $context['filters']['itemsPerPage'] ?? 100;
+
         if ($operation->getName() === 'series') {
             $page = $context['filters']['page'] ?? 1;
-            $itemsPerPage = $context['filters']['itemsPerPage'] ?? 100;
+
 
             /// Retrieving filtered series from the repository side with pagination and sort them in alphabetical order
             $series = $this->serieRepository->findFilteredSeries($page, $itemsPerPage);
@@ -73,6 +75,7 @@ final readonly class SerieDataProvider implements ProviderInterface
 
             return
                 ['totalItems' => $totalItems,
+                    'itemsPerPage' => $itemsPerPage,
                     'series' => $series,
                 ];
 
@@ -94,7 +97,11 @@ final readonly class SerieDataProvider implements ProviderInterface
 
             usort($series, fn($a, $b) => strnatcasecmp($a->title, $b->title));
 
-            return $series;
+            return
+                [
+                    'itemsPerPage' => $itemsPerPage,
+                    'series' => $series,
+                ];
         }
 
         // Default: return all series

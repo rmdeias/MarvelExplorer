@@ -52,10 +52,13 @@ final class SeriesFrontController extends AbstractController
             'query' => ['page' => $page]
         ]);
         $datas = $response->toArray();
-        $totalItems = $datas['member'][0];
-        $series = $datas['member'][1];
 
-        $totalPages = ceil($totalItems / 100);
+        $totalItems = $datas['member'][0];
+        $itemsPerPage = $datas['member'][1];
+        $series = $datas['member'][2];
+
+
+        $totalPages = ceil($totalItems / $itemsPerPage);
 
         if ($page > $totalPages) {
             return $this->redirectToRoute('front_series');
@@ -109,17 +112,18 @@ final class SeriesFrontController extends AbstractController
             ]
         ]);
 
-        $data = $response->toArray();
-        $seriesResearch = $data['member'] ?? [];
+        $datas = $response->toArray();
+
+        $itemsPerPage = $datas['member'][0];
+        $seriesResearch = $datas['member'][1];
 
         //Clip results for the current page
-        $perPage = 100;
-        $offset = ($page - 1) * $perPage;
-        $series = array_slice($seriesResearch, $offset, $perPage);
+        $offset = ($page - 1) * $itemsPerPage;
+        $series = array_slice($seriesResearch, $offset, $itemsPerPage);
 
         $totalItems = count($seriesResearch);
 
-        $totalPages = ceil($totalItems / $perPage);
+        $totalPages = ceil($totalItems / $itemsPerPage);
         $pageRange = 10;
         $startPage = max(1, $page - intval($pageRange / 2));
         $endPage = min($totalPages, $startPage + $pageRange - 1);
@@ -130,7 +134,7 @@ final class SeriesFrontController extends AbstractController
             'totalPages' => $totalPages,
             'startPage' => $startPage,
             'endPage' => $endPage,
-            'routeName' => 'front_comics_search',
+            'routeName' => 'front_series_search',
             'searchTitle' => $title,
         ]);
     }

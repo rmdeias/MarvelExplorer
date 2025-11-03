@@ -48,7 +48,7 @@ final class ComicsFrontController extends AbstractController
      * Displays a paginated list of comics.
      *
      * This controller fetches comics from the API Platform endpoint `/api/comics`
-     * using pagination (100 items per page). It also retrieves the total number of
+     * using pagination from entity. It also retrieves the total number of
      * comics via the `/api/countFilteredComics` endpoint to calculate the number of pages.
      *
      * If the current page exceeds the total number of pages, the user is redirected
@@ -77,9 +77,10 @@ final class ComicsFrontController extends AbstractController
 
         $datas = $response->toArray()['member'] ?? [];
         $totalItems = $datas[0];
-        $comics = $datas[1];
+        $itemsPerPage = $datas[1];
+        $comics = $datas[2];
 
-        $totalPages = ceil($totalItems / 100);
+        $totalPages = ceil($totalItems / $itemsPerPage);
 
         if ($page > $totalPages) {
             return $this->redirectToRoute('front_comics');
@@ -137,17 +138,17 @@ final class ComicsFrontController extends AbstractController
             ]
         ]);
 
-        $data = $response->toArray();
-        $comicsResearch = $data['member'] ?? [];
+        $datas = $response->toArray();
+        $comicsResearch = $datas['member'][1] ?? [];
+        $itemsPerPage = $datas['member'][0];
 
         //Clip results for the current page
-        $perPage = 100;
-        $offset = ($page - 1) * $perPage;
-        $comics = array_slice($comicsResearch, $offset, $perPage);
+        $offset = ($page - 1) * $itemsPerPage;
+        $comics = array_slice($comicsResearch, $offset, $itemsPerPage);
 
         $totalItems = count($comicsResearch);
 
-        $totalPages = ceil($totalItems / $perPage);
+        $totalPages = ceil($totalItems / $itemsPerPage);
         $pageRange = 10;
         $startPage = max(1, $page - intval($pageRange / 2));
         $endPage = min($totalPages, $startPage + $pageRange - 1);
