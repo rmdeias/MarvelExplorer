@@ -11,3 +11,33 @@
 {% else %}
     <p>Aucun character trouvé.</p>
 {% endfor %}
+
+<div class="pagination">
+    {% set queryParams = {} %}
+    {% if searchName is defined and searchName != '' %}
+        {% set queryParams = {'name': searchName} %}
+    {% endif %}
+
+    {% if totalPages > 0 %}
+        {% if currentPage > 1 %}
+            <a href="{{ path(routeName, queryParams | merge({'page': currentPage - 1})) }}"
+               data-page="{{ currentPage - 1 }}">« Previous</a>
+        {% endif %}
+
+        {% for p in startPage..endPage %}
+            {% if p == currentPage %}
+                <span class="current">{{ p }}</span>
+            {% else %}
+                <a href="{{ path(routeName, queryParams | merge({'page': p})) }}" data-page="{{ p }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if currentPage < totalPages %}
+            <a href="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}"
+               data-page="{{ currentPage + 1 }}">Next »</a>
+        {% endif %}
+        {% if currentPage < totalPages %}
+            <a href="{{ path(routeName, queryParams | merge({'page':  totalPages})) }}" data-page="{{ totalPages }}">...Last</a>
+        {% endif %}
+    {% endif %}
+</div>
