@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 ])]
 #[ApiResource(
     normalizationContext: ['groups' => ['character:read']],
+    paginationItemsPerPage: 100,
     operations: [
         new GetCollection(
             uriTemplate: '/characters'

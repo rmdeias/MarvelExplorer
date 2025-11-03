@@ -39,15 +39,35 @@ final class CharactersFrontController extends AbstractController
     public function allCharacters(Request $request): Response
     {
         $baseUrl = $request->getSchemeAndHttpHost();
+        $page = max(1, (int)$request->query->get('page', 1));
 
-        $response = $this->client->request('GET', $baseUrl . '/api/characters');
-        $data = $response->toArray();
+        $response = $this->client->request('GET', $baseUrl . '/api/characters', [
+            'query' => ['page' => $page]
+        ]);
+        $datas = $response->toArray();
 
-        $characters = $data['member'] ?? [];
+        $totalItems = $datas['totalItems'];
+        $characters = $datas['member'] ?? [];
+
         usort($characters, fn($a, $b) => strnatcasecmp($a['name'], $b['name']));
+
+        $totalPages = ceil($totalItems / count($characters));
+
+        if ($page > $totalPages) {
+            return $this->redirectToRoute('front_characters');
+        }
+
+        $pageRange = 10;
+        $startPage = max(1, $page - intval($pageRange / 2));
+        $endPage = min($totalPages, $startPage + $pageRange - 1);
+
 
         return $this->render('characters/index.html.twig', [
             'characters' => $characters,
+            'currentPage' => $page,
+            'startPage' => $startPage,
+            'endPage' => $endPage,
+            'totalPages' => $totalPages,
         ]);
     }
 
@@ -68,16 +88,42 @@ final class CharactersFrontController extends AbstractController
             return $this->redirectToRoute('front_characters');
         }
 
+        $page = max(1, (int)$request->query->get('page', 1));
+
         $baseUrl = $request->getSchemeAndHttpHost();
         $response = $this->client->request(
             'GET',
-            $baseUrl . '/api/searchCharactersByName?name=' . urlencode($name)
-        );
+            $baseUrl . '/api/searchCharactersByName', [
+            'query' => [
+                'name' => urlencode($name),
+                'page' => $page,
+            ]
+        ]);
 
-        $charactersData = $response->toArray();
+
+        $datas = $response->toArray();
+        $charactersResearch = $datas['member'][1] ?? [];
+        $itemsPerPage = $datas['member'][0];
+
+        //Clip results for the current page
+        $offset = ($page - 1) * $itemsPerPage;
+        $characters = array_slice($charactersResearch, $offset, $itemsPerPage);
+
+        $totalItems = count($charactersResearch);
+
+        $totalPages = ceil($totalItems / $itemsPerPage);
+        $pageRange = 10;
+        $startPage = max(1, $page - intval($pageRange / 2));
+        $endPage = min($totalPages, $startPage + $pageRange - 1);
 
         return $this->render('characters/_list.html.twig', [
-            'characters' => $charactersData['member'] ?? [],
+            'characters' => $characters,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'startPage' => $startPage,
+            'endPage' => $endPage,
+            'routeName' => 'front_characters_search',
+            'searchTitle' => $name,
         ]);
     }
 
