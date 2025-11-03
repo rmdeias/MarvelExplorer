@@ -26,33 +26,6 @@ class CharacterRepository extends ServiceEntityRepository
         parent::__construct($registry, Character::class);
     }
 
-    /**
-     * Search for characters by name.
-     *
-     * This method performs a partial match search on the `name` field of Character entities.
-     * Results are limited to 50 items and ordered alphabetically by name.
-     *
-     * @param string $name The search string to filter characters by their name
-     *
-     * @return array<int, array{marvelId: int, name: string, thumbnail: string|null}>
-     *     Returns an array of associative arrays containing:
-     *     - 'marvelId' : The character's Marvel ID
-     *     - 'name'     : The character's name
-     *     - 'thumbnail': URL or path to the character's thumbnail image
-     */
-    public function searchCharactersByName(string $name): array
-    {
-        $qb = $this->createQueryBuilder('c');
-
-        $qb->select('c.marvelId', 'c.name', 'c.thumbnail')
-            ->where('c.name LIKE :search')
-            ->setParameter('search', '%' . $name . '%')
-            ->orderBy('c.name', 'ASC')
-            ->setMaxResults(50);
-
-        return $qb->getQuery()->getResult();
-    }
-
     // Uncommented example methods for reference
     /*
     /**
