@@ -3,50 +3,64 @@
 {% block body %}
     <input type="text" id="search-bar" placeholder="Rechercher un character..."/>
 
-    <section class="characters-list" id="character-list">
-        {% include 'characters/_list.html.twig' with { characters: characters } %}
+    <section class="comics-list" id="character-list">
+        {% include 'characters/_list.html.twig' with {
+            characters: characters,
+            currentPage: currentPage,
+            startPage: startPage,
+            endPage: endPage,
+            totalPages: totalPages,
+            routeName: routeName|default('front_characters'),
+            searchName: ''
+        } %}
     </section>
-    {#
-    <div class="pagination">
-        {% if currentPage > 1 %}
-            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage - 1})) }}">« Previous</a>
-        {% endif %}
 
-        {% for p in startPage..endPage %}
-            {% if p == currentPage %}
-                <span class="current">{{ p }}</span>
-            {% else %}
-                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': p})) }}">{{ p }}</a>
-            {% endif %}
-        {% endfor %}
-
-        {% if currentPage < totalPages %}
-            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'page': currentPage + 1})) }}">Next »</a>
-        {% endif %}
-    </div>
-    #}
     <script>
         const searchInput = document.getElementById('search-bar');
         const characterList = document.getElementById('character-list');
 
-        searchInput.addEventListener('input', function () {
-            const query = searchInput.value.trim();
+        let currentQuery = '';
+        let currentPage = 1;
 
-            if (query === '') {
-                // Revenir à la liste initiale sans faire de fetch
-                characterList.innerHTML = `{% include 'characters/_list.html.twig' with { characters: characters } %}`;
-                return;
-            }
+        function loadCharacters(name, page = 1) {
+            currentQuery = name;
+            currentPage = page;
 
-            fetch(`/characters/search?name=${encodeURIComponent(query)}`)
+            fetch(`/characters/search?name=${encodeURIComponent(name)}&page=${page}`)
                 .then(res => res.text())
                 .then(html => {
                     characterList.innerHTML = html;
+
+                    // Pagination AJAX
+                    characterList.querySelectorAll('.pagination a').forEach(link => {
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            const newPage = parseInt(this.dataset.page);
+                            loadCharacters(currentQuery, newPage);
+                        });
+                    });
                 })
                 .catch(err => {
                     console.error(err);
                     characterList.innerHTML = '<p>Erreur lors de la récupération des characters.</p>';
                 });
+        }
+
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value.trim();
+            if (query.length < 3) {
+                characterList.innerHTML = `{% include 'characters/_list.html.twig' with {
+                    characters: characters,
+                    currentPage: currentPage,
+                    startPage: startPage,
+                    endPage: endPage,
+                    totalPages: totalPages,
+                    routeName: routeName|default('front_characters'),
+                    searchName: ''
+                } %}`;
+                return;
+            }
+            loadCharacters(query, 1);
         });
     </script>
 
