@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\CharactersListDTO;
 use App\Entity\Character;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,6 +27,38 @@ class CharacterRepository extends ServiceEntityRepository
         parent::__construct($registry, Character::class);
     }
 
+    /**
+     * Returns an array of CharactersListDTO objects.
+     *
+     * @return CharactersListDTO[] Array of DTOs containing marvelId, name, and thumbnail
+     */
+    public function findDTOCharacters(int $page, int $itemsPerPage): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb->select('c.marvelId', 'c.name', 'c.thumbnail')
+            ->setFirstResult(($page - 1) * $itemsPerPage)->setMaxResults($itemsPerPage);
+        $results = $qb->getQuery()->getResult();
+        return array_map(fn($r) => new CharactersListDTO(
+            $r['marvelId'],
+            $r['name'],
+            $r['thumbnail']
+        ), $results);
+
+    }
+
+
+    /**
+     * Returns the total number of characters.
+     *
+     * @return array{totalItems: int} The total number of filtered characters
+     */
+    public function countCharacters(): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb->select('count(c.marvelId)');
+        $total = (int)$qb->getQuery()->getSingleScalarResult();
+        return ['totalItems' => $total,];
+    }
     // Uncommented example methods for reference
     /*
     /**
