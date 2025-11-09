@@ -4,6 +4,7 @@ namespace App\Controller\Front;
 
 use App\Service\ExtractCreatorService;
 use App\Service\ExtractVariantService;
+use App\Service\PagingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,7 +41,8 @@ final class ComicsFrontController extends AbstractController
     public function __construct(
         private readonly HttpClientInterface   $client,
         private readonly ExtractCreatorService $extractCreatorsService,
-        private readonly ExtractVariantService $extractVariantsService)
+        private readonly ExtractVariantService $extractVariantsService,
+        private readonly PagingService         $pagingService)
     {
     }
 
@@ -80,23 +82,19 @@ final class ComicsFrontController extends AbstractController
         $itemsPerPage = $datas[1];
         $comics = $datas[2];
 
-        $totalPages = ceil($totalItems / $itemsPerPage);
+        $paging = $this->pagingService->paging($totalItems, $page, $itemsPerPage, 8);
 
-        if ($page > $totalPages) {
+
+        if ($page > $paging['totalPages']) {
             return $this->redirectToRoute('front_comics');
         }
-
-        $pageRange = 10;
-        $startPage = max(1, $page - intval($pageRange / 2));
-        $endPage = min($totalPages, $startPage + $pageRange - 1);
-
 
         return $this->render('comics/index.html.twig', [
             'comics' => $comics,
             'currentPage' => $page,
-            'startPage' => $startPage,
-            'endPage' => $endPage,
-            'totalPages' => $totalPages,
+            'startPage' => $paging['startPage'],
+            'endPage' => $paging['endPage'],
+            'totalPages' => $paging['totalPages'],
         ]);
     }
 
@@ -145,20 +143,17 @@ final class ComicsFrontController extends AbstractController
         //Clip results for the current page
         $offset = ($page - 1) * $itemsPerPage;
         $comics = array_slice($comicsResearch, $offset, $itemsPerPage);
-
         $totalItems = count($comicsResearch);
 
-        $totalPages = ceil($totalItems / $itemsPerPage);
-        $pageRange = 10;
-        $startPage = max(1, $page - intval($pageRange / 2));
-        $endPage = min($totalPages, $startPage + $pageRange - 1);
+        $paging = $this->pagingService->paging($totalItems, $page, $itemsPerPage, 8);
+
 
         return $this->render('comics/_list.html.twig', [
             'comics' => $comics,
             'currentPage' => $page,
-            'totalPages' => $totalPages,
-            'startPage' => $startPage,
-            'endPage' => $endPage,
+            'totalPages' => $paging['totalPages'],
+            'startPage' => $paging['startPage'],
+            'endPage' => $paging['endPage'],
             'routeName' => 'front_comics_search',
             'searchTitle' => $title,
         ]);
@@ -196,9 +191,8 @@ final class ComicsFrontController extends AbstractController
         $comicDetailsData = $this->extractCreatorsService->enrichCreators($comicDetailsData, $baseUrl);
         $comicDetailsData = $this->extractVariantsService->enrichVariants($comicDetailsData, $baseUrl);
 
-
         return $this->render('comics/comic_details.html.twig', [
-            'comic' => $comicDetailsData ?? [],
+            'comic' => $comicDetailsData,
         ]);
     }
 }

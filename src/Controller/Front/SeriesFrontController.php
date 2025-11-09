@@ -3,6 +3,7 @@
 namespace App\Controller\Front;
 
 use App\Service\ExtractCreatorService;
+use App\Service\PagingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +24,8 @@ final class SeriesFrontController extends AbstractController
      */
     public function __construct(
         private readonly HttpClientInterface   $client,
-        private readonly ExtractCreatorService $extractCreatorsService)
+        private readonly ExtractCreatorService $extractCreatorsService,
+        private readonly PagingService         $pagingService)
     {
     }
 
@@ -57,24 +59,19 @@ final class SeriesFrontController extends AbstractController
         $itemsPerPage = $datas['member'][1];
         $series = $datas['member'][2];
 
+        $paging = $this->pagingService->paging($totalItems, $page, $itemsPerPage, 8);
 
-        $totalPages = ceil($totalItems / $itemsPerPage);
-
-        if ($page > $totalPages) {
+        if ($page > $paging['totalPages']) {
             return $this->redirectToRoute('front_series');
         }
-
-        $pageRange = 10;
-        $startPage = max(1, $page - intval($pageRange / 2));
-        $endPage = min($totalPages, $startPage + $pageRange - 1);
 
 
         return $this->render('series/index.html.twig', [
             'series' => $series,
             'currentPage' => $page,
-            'startPage' => $startPage,
-            'endPage' => $endPage,
-            'totalPages' => $totalPages,
+            'startPage' => $paging['startPage'],
+            'endPage' => $paging['endPage'],
+            'totalPages' =>$paging['totalPages']
         ]);
     }
 
@@ -113,27 +110,22 @@ final class SeriesFrontController extends AbstractController
         ]);
 
         $datas = $response->toArray();
-
         $itemsPerPage = $datas['member'][0];
         $seriesResearch = $datas['member'][1];
 
         //Clip results for the current page
         $offset = ($page - 1) * $itemsPerPage;
         $series = array_slice($seriesResearch, $offset, $itemsPerPage);
-
         $totalItems = count($seriesResearch);
 
-        $totalPages = ceil($totalItems / $itemsPerPage);
-        $pageRange = 10;
-        $startPage = max(1, $page - intval($pageRange / 2));
-        $endPage = min($totalPages, $startPage + $pageRange - 1);
+        $paging = $this->pagingService->paging($totalItems, $page, $itemsPerPage, 8);
 
         return $this->render('series/_list.html.twig', [
             'series' => $series,
             'currentPage' => $page,
-            'totalPages' => $totalPages,
-            'startPage' => $startPage,
-            'endPage' => $endPage,
+            'startPage' => $paging['startPage'],
+            'endPage' => $paging['endPage'],
+            'totalPages' =>$paging['totalPages'],
             'routeName' => 'front_series_search',
             'searchTitle' => $title,
         ]);
