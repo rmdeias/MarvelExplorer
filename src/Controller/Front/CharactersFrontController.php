@@ -55,6 +55,10 @@ final class CharactersFrontController extends AbstractController
 
         $paging = $this->pagingService->paging($totalItems, $page, $itemsPerPage, 8);
 
+        if ($page > $paging['totalPages']) {
+            return $this->redirectToRoute('front_characters');
+        }
+
         return $this->render('characters/index.html.twig', [
             'characters' => $characters,
             'currentPage' => $page,
