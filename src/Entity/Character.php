@@ -23,7 +23,9 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     paginationItemsPerPage: 100,
     operations: [
         new GetCollection(
-            uriTemplate: '/characters'
+            name: 'characters',
+            uriTemplate: '/characters',
+            provider: CharacterDataProvider::class,
         ),
         new GetCollection(
             name: 'searchCharactersByName',

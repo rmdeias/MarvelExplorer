@@ -2,7 +2,9 @@
 
 namespace App\Controller\Front;
 
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\PagingService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,7 +23,8 @@ final class CharactersFrontController extends AbstractController
      *
      * @param HttpClientInterface $client HTTP client for calling API endpoints
      */
-    public function __construct(private readonly HttpClientInterface $client)
+    public function __construct(private readonly HttpClientInterface $client,
+                                private readonly PagingService       $pagingService)
     {
     }
 
@@ -46,28 +49,18 @@ final class CharactersFrontController extends AbstractController
         ]);
         $datas = $response->toArray();
 
-        $totalItems = $datas['totalItems'];
-        $characters = $datas['member'] ?? [];
+        $totalItems = $datas['member'][0];
+        $itemsPerPage = $datas['member'][1];
+        $characters = $datas['member'][2];
 
-        usort($characters, fn($a, $b) => strnatcasecmp($a['name'], $b['name']));
-
-        $totalPages = ceil($totalItems / count($characters));
-
-        if ($page > $totalPages) {
-            return $this->redirectToRoute('front_characters');
-        }
-
-        $pageRange = 10;
-        $startPage = max(1, $page - intval($pageRange / 2));
-        $endPage = min($totalPages, $startPage + $pageRange - 1);
-
+        $paging = $this->pagingService->paging($totalItems, $page, $itemsPerPage, 8);
 
         return $this->render('characters/index.html.twig', [
             'characters' => $characters,
             'currentPage' => $page,
-            'startPage' => $startPage,
-            'endPage' => $endPage,
-            'totalPages' => $totalPages,
+            'startPage' => $paging['startPage'],
+            'endPage' => $paging['endPage'],
+            'totalPages' => $paging['totalPages'],
         ]);
     }
 
@@ -100,7 +93,6 @@ final class CharactersFrontController extends AbstractController
             ]
         ]);
 
-
         $datas = $response->toArray();
         $charactersResearch = $datas['member'][1] ?? [];
         $itemsPerPage = $datas['member'][0];
@@ -108,20 +100,16 @@ final class CharactersFrontController extends AbstractController
         //Clip results for the current page
         $offset = ($page - 1) * $itemsPerPage;
         $characters = array_slice($charactersResearch, $offset, $itemsPerPage);
-
         $totalItems = count($charactersResearch);
 
-        $totalPages = ceil($totalItems / $itemsPerPage);
-        $pageRange = 10;
-        $startPage = max(1, $page - intval($pageRange / 2));
-        $endPage = min($totalPages, $startPage + $pageRange - 1);
+        $paging = $this->pagingService->paging($totalItems, $page, $itemsPerPage, 8);
 
         return $this->render('characters/_list.html.twig', [
             'characters' => $characters,
             'currentPage' => $page,
-            'totalPages' => $totalPages,
-            'startPage' => $startPage,
-            'endPage' => $endPage,
+            'startPage' => $paging['$startPage'],
+            'endPage' => $paging['$endPage'],
+            'totalPages' => $paging['$totalPages'],
             'routeName' => 'front_characters_search',
             'searchTitle' => $name,
         ]);

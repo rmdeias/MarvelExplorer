@@ -38,6 +38,23 @@ final readonly class CharacterDataProvider implements ProviderInterface
     {
         $itemsPerPage = $context['filters']['itemsPerPage'] ?? 100;
 
+
+        if ($operation->getName() === 'characters') {
+            $page = $context['filters']['page'] ?? 1;
+            /// Retrieving characters from the repository side with paging and sort them in alphabetical order
+            $characters = $this->characterRepository->findDTOCharacters($page, $itemsPerPage);
+            $totalItems = $this->characterRepository->countCharacters()['totalItems'];
+            usort($characters, fn($a, $b) => strnatcasecmp($a->name, $b->name));
+
+            return
+                [
+                    'totalItems' => $totalItems,
+                    'itemsPerPage' => $itemsPerPage,
+                    'characters' => $characters,
+                ];
+
+        }
+
         // Search characters by name
         if ($operation->getName() === 'searchCharactersByName') {
 
@@ -60,7 +77,7 @@ final readonly class CharacterDataProvider implements ProviderInterface
                     'characters' => $characters,
                 ];
         }
-        // Default: return all comics
+        // Default: return all characters
         return $this->characterRepository->findAll();
 
     }
