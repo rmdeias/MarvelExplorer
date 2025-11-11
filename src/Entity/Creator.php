@@ -19,10 +19,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Table(name: '`creator`', indexes: [
     new ORM\Index(name: 'idx_marvel_id', columns: ['marvelId'])
 ])]
-
 #[ApiResource(
     normalizationContext: ['groups' => ['creator:read']],
     denormalizationContext: ['groups' => ['creator:write']],
+    paginationItemsPerPage: 1000,
+    order: ['lastName' => 'ASC'],
     operations: [
         new GetCollection(
             uriTemplate: '/creators'
@@ -49,13 +50,13 @@ class Creator
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['creator:read'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $modified = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['creator:read'])]
     private ?string $thumbnail = null;
 
     #[ORM\Column(length: 255)]
