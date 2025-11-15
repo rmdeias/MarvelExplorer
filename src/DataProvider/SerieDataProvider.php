@@ -89,7 +89,7 @@ final readonly class SerieDataProvider implements ProviderInterface
                 'series',
                 'title',
                 $title,
-                ['variant', 'paperback', 'hardcover', 'omnibus'],
+                ['variant', 'paperback', 'hardcover', 'omnibus','mini-poster'],
                 500,
                 fn(array $source) => $this->mapToSeriesDTO($source)
             );

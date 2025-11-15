@@ -56,10 +56,12 @@ class SerieRepository extends ServiceEntityRepository
             ->andWhere('c.title NOT LIKE :paperback')
             ->andWhere('c.title NOT LIKE :hardcover')
             ->andWhere('c.title NOT LIKE :omnibus')
+            ->andWhere('c.title NOT LIKE :mini')
             ->setParameter('variant', '%variant%')
             ->setParameter('paperback', '%paperback%')
             ->setParameter('hardcover', '%hardcover%')
             ->setParameter('omnibus', '%omnibus%')
+            ->setParameter('mini', '%mini-poster%')
             ->orderBy('c.title', 'ASC')
             ->setFirstResult(($page - 1) * $itemsPerPage)->setMaxResults($itemsPerPage);
         $results = $qb->getQuery()->getResult();
@@ -79,13 +81,23 @@ class SerieRepository extends ServiceEntityRepository
         SELECT marvel_id, title, thumbnail
         FROM serie
         WHERE JSON_CONTAINS(creators, :creator, "$")
-    ';
+        and title NOT LIKE :variant
+        and title NOT LIKE :paperback
+        and title NOT LIKE :hardcover
+        and title NOT LIKE :omnibus
+        and title NOT LIKE :mini';
 
         $stmt = $conn->prepare($sql);
 
         // IMPORTANT : json_encode le paramètre
         $result = $stmt->executeQuery([
-            'creator' => json_encode(['marvelCreatorId' => (int)$creatorId])
+            'creator' => json_encode(['marvelCreatorId' => (int)$creatorId]),
+            'variant' => '%variant%',
+            'paperback' => '%paperback%',
+            'hardcover' => '%hardcover%',
+            'omnibus' => '%omnibus%',
+            'mini' => '%mini-poster%',
+
         ]);
 
         $rows = $result->fetchAllAssociative();
