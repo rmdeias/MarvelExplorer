@@ -32,6 +32,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
             paginationEnabled: false
         ),
         new Get(
+            name: 'seriesByCreator',
+            uriTemplate: '/seriesByCreator/{id}',
+            provider: SerieDataProvider::class,
+            paginationEnabled: false
+        ),
+        new Get(
             uriTemplate: '/series/{id}',
             uriVariables: ['id' => 'marvelId']
         ),

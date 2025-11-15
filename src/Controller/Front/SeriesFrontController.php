@@ -71,7 +71,7 @@ final class SeriesFrontController extends AbstractController
             'currentPage' => $page,
             'startPage' => $paging['startPage'],
             'endPage' => $paging['endPage'],
-            'totalPages' =>$paging['totalPages']
+            'totalPages' => $paging['totalPages']
         ]);
     }
 
@@ -125,7 +125,7 @@ final class SeriesFrontController extends AbstractController
             'currentPage' => $page,
             'startPage' => $paging['startPage'],
             'endPage' => $paging['endPage'],
-            'totalPages' =>$paging['totalPages'],
+            'totalPages' => $paging['totalPages'],
             'routeName' => 'front_series_search',
             'searchTitle' => $title,
         ]);
@@ -160,11 +160,13 @@ final class SeriesFrontController extends AbstractController
         $response = $this->client->request('GET', $baseUrl . '/api/series/' . urlencode($id));
         $serieDetailsData = $response->toArray();
 
+        usort($serieDetailsData['comics'], fn($a, $b) => strnatcasecmp($a['title'], $b['title']));
+
         $serieDetailsData = $this->extractCreatorsService->enrichCreators($serieDetailsData, $baseUrl);
 
 
         return $this->render('series/serie_details.html.twig', [
-            'serie' => $serieDetailsData ?? [],
+            'serie' => $serieDetailsData,
         ]);
     }
 }
