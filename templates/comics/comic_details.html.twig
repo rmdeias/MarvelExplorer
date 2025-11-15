@@ -23,7 +23,7 @@
                         {% for creator in comic.creators %}
                             <li>
                                 <span class="role">{{ creator.role|capitalize }}</span> :
-                                {{ creator.fullName ?? 'Unknown' }}
+                                <a href = "/creators/{{ creator.marvelId }}-{{ creator.fullName|slug|lower}}">{{ creator.fullName}}</a>
                             </li>
                         {% endfor %}
                     </ul>
