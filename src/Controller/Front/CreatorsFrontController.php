@@ -68,4 +68,44 @@ final class CreatorsFrontController extends AbstractController
 
         ]);
     }
+
+    /**
+     * Serie page details.
+     *
+     * Reads the 'id' query parameter from the request, calls the internal API
+     * endpoint '/api/creators/{id}-{slug}', and renders the results in the
+     * 'creators/creator_details.html.twig' template.
+     * If the id is empty, redirects to the main creators page.
+     *
+     * @param Request $request HTTP request object
+     * @return Response Rendered HTML response with search results
+     *
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    #[Route('/creators/{id}-{slug}', name: 'creator_details', methods: ['GET'])]
+    public function creatorDetails(Request $request, string $id): Response
+    {
+
+        if (empty($id)) {
+            return $this->redirectToRoute('front_creators');
+        }
+
+        $baseUrl = $request->getSchemeAndHttpHost();
+        $response = $this->client->request('GET', $baseUrl . '/api/creators/' . urlencode($id));
+        $creatorDetailsData = $response->toArray();
+        $creatorFullName = $creatorDetailsData['fullName'];
+
+        $response = $this->client->request('GET', $baseUrl . '/api/seriesByCreator/' . urlencode($id));
+        $seriesByCreator['series'] = $response->toArray()['member'][0];
+        $seriesByCreator['creator'] = $creatorFullName;
+
+
+        return $this->render('creators/creator_details.html.twig', [
+            'seriesByCreator' => $seriesByCreator,
+        ]);
+    }
 }

@@ -81,7 +81,6 @@ final readonly class SerieDataProvider implements ProviderInterface
 
         }
 
-        // Search series by title
         if ($operation->getName() === 'searchSeriesByTitle') {
             $request = $context['request'] ?? null;
             $title = $request?->query->get('title', '');
@@ -90,7 +89,7 @@ final readonly class SerieDataProvider implements ProviderInterface
                 'series',
                 'title',
                 $title,
-                ['variant', 'paperback', 'hardcover'],
+                ['variant', 'paperback', 'hardcover', 'omnibus'],
                 500,
                 fn(array $source) => $this->mapToSeriesDTO($source)
             );
@@ -102,6 +101,19 @@ final readonly class SerieDataProvider implements ProviderInterface
                     'itemsPerPage' => $itemsPerPage,
                     'series' => $series,
                 ];
+        }
+
+        if ($operation->getName() === 'seriesByCreator') {
+
+            $creatorId = (string)$uriVariables['id'];
+
+            $series = $this->serieRepository->findSeriesByCreatorId($creatorId);
+
+            usort($series, fn($a, $b) => strnatcasecmp($a->title, $b->title));
+
+            return [
+                'series' => $series,
+            ];
         }
 
         // Default: return all series

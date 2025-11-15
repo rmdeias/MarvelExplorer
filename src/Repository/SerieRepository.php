@@ -55,9 +55,11 @@ class SerieRepository extends ServiceEntityRepository
             ->where('c.title NOT LIKE :variant')
             ->andWhere('c.title NOT LIKE :paperback')
             ->andWhere('c.title NOT LIKE :hardcover')
+            ->andWhere('c.title NOT LIKE :omnibus')
             ->setParameter('variant', '%variant%')
             ->setParameter('paperback', '%paperback%')
             ->setParameter('hardcover', '%hardcover%')
+            ->setParameter('omnibus', '%omnibus%')
             ->orderBy('c.title', 'ASC')
             ->setFirstResult(($page - 1) * $itemsPerPage)->setMaxResults($itemsPerPage);
         $results = $qb->getQuery()->getResult();
@@ -68,6 +70,38 @@ class SerieRepository extends ServiceEntityRepository
         ), $results);
 
     }
+
+    public function findSeriesByCreatorId(int $creatorId): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+        SELECT marvel_id, title, thumbnail
+        FROM serie
+        WHERE JSON_CONTAINS(creators, :creator, "$")
+    ';
+
+        $stmt = $conn->prepare($sql);
+
+        // IMPORTANT : json_encode le paramètre
+        $result = $stmt->executeQuery([
+            'creator' => json_encode(['marvelCreatorId' => (int)$creatorId])
+        ]);
+
+        $rows = $result->fetchAllAssociative();
+
+        return array_map(fn($r) => new SeriesListDTO(
+            $r['marvel_id'],
+            $r['title'],
+            $r['thumbnail']
+        ), $rows);
+    }
+
+
+
+
+
+
 
     //    /**
     //     * @return Serie[] Returns an array of Serie objects
