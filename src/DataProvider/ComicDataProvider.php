@@ -94,7 +94,7 @@ final readonly class ComicDataProvider implements ProviderInterface
                 'comics',
                 'title',
                 $title,
-                ['variant', 'paperback', 'hardcover'],
+                ['variant', 'paperback', 'hardcover','mini-poster'],
                 500,
                 fn(array $source) => $this->mapToComicsDTO($source)
             );
