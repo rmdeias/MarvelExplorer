@@ -37,7 +37,7 @@
                         {% if  'variant' not in comic.title|lower %}
                             <div class="variant-card">
                                 <a href="/comics/{{ comic.marvelId }}-{{ comic.title|slug|lower }}">
-                                    <img src="{{ comic.thumbnail }}" alt="{{ comic.title }}"></a>
+                                    <img src="{{ comic.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ comic.title }}"></a>
                                 <p>{{ comic.title }}</p>
                             </div>
                         {% endif %}
