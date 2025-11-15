@@ -5,7 +5,7 @@
     <div class="comic-detail">
         <div class="comic-main">
             <div class="comic-image">
-                <img src="{{ serie.thumbnail }}" alt="{{ serie.title }}">
+                <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ serie.title }}">
             </div>
 
             <div class="comic-info">
@@ -33,7 +33,7 @@
             <div class="comic-variants">
                 <h2>Comics</h2>
                 <div class="variant-list">
-                    {% for comic in serie.comics|sort %}
+                    {% for comic in serie.comics %}
                         {% if  'variant' not in comic.title|lower %}
                             <div class="variant-card">
                                 <a href="/comics/{{ comic.marvelId }}-{{ comic.title|slug|lower }}">
