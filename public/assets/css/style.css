@@ -1,22 +1,27 @@
-
+/* ==========================
+   Global Styles
+========================== */
 body {
-    background: url("https://www.transparenttextures.com/patterns/wall-4-light.png"),
-    linear-gradient(135deg, #0a0a0a 0%, #1b0000 40%, #7a0000 70%, #1b0000 90%);
+    background: url("https://www.transparenttextures.com/patterns/wall-4-light.png"), linear-gradient(135deg, #0a0a0a 0%, #1b0000 40%, #7a0000 70%, #1b0000 90%);
     background-attachment: fixed;
     background-size: auto, cover;
     color: #f5f5f5;
     font-family: 'Roboto', sans-serif;
+    margin: 0;
 }
 
 a {
     text-decoration: none;
-    text-underline: none;
+    color: inherit;
 }
 
-/* Navbar style */
+/* ==========================
+   Navbar
+========================== */
 .navbar {
     background: linear-gradient(90deg, #660000, #330000, #1a0000);
     border-bottom: 2px solid #990000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
 .navbar .nav-link {
@@ -25,65 +30,130 @@ a {
 }
 
 .navbar .nav-link:hover {
-    color: #ff1a1a;
+    color: #ff4757;
     transform: scale(1.05);
-}
-
-.navbar-brand img {
-    max-height: 40px;
-}
-
-.banner img {
-    max-height: 250px;
-    object-fit: cover;
-    object-position: center;
 }
 
 .navbar .nav-link.active {
     border-bottom: 2px solid #e62429;
 }
 
+.navbar-brand img {
+    max-height: 40px;
+}
+
+/* ==========================
+   Banner
+========================== */
+.banner img {
+    max-height: 250px;
+    object-fit: cover;
+    object-position: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+}
+
+/* ==========================
+   Headings
+========================== */
 h1 {
-    color: #222;
+    font-family: 'Roboto', sans-serif;
+    font-size: 3rem;
+    color: white;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 40px 0 20px;
+    position: relative;
+    z-index: 1;
+    text-shadow: 2px 2px 8px rgba(0,0,0);
+    transition: transform 0.3s ease, text-shadow 0.3s ease;
 }
 
-#search-bar {
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    width: 300px;
-}
-
-.comic-list, .characters-list, .serie-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+/* ==========================
+   Comic / Series Grid
+========================== */
+.comic-list, .serie-list, .character-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 cartes par ligne */
+    gap: 20px;
     padding: 20px;
+    justify-items: center;
+    margin-bottom: 90px;
 }
 
+
+/* ==========================
+   Cards
+========================== */
 .comic-card, .character-card, .serie-card {
     position: relative;
-    background: black;
-    box-shadow: 0 2px 6px rgb(255, 255, 255);
+    box-shadow: 0 0 20px rgb(255, 255, 255);
     height: 410px;
-    width: 230px;
+    width: 280px;
     margin: 10px;
-    padding: 2px;
     text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.comic-card:hover, .character-card:hover, .serie-card:hover, .variant-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 30px rgb(0, 0, 0);
 }
 
 .comic-card img, .character-card img, .serie-card img {
     width: 100%;
+    min-height: -webkit-fill-available;
 }
 
-.comic-card p, .character-card p, .serie-card-card p {
+.comic-card p, .character-card p, .serie-card p{
     font-size: 13px;
-    color: white;
+    color: #fff;
     font-weight: bold;
 }
+/* ==========================
+   Cards Infos
+========================== */
+.card-infos{
+    position: absolute;
+    bottom: -21px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.8); /* noir semi-transparent */
+    color: #fff;
+    padding: 2px;
+    text-align: center;
+    box-shadow: inset 0 1px 5px rgba(255,255,255,0.1);
+    transition: background 0.3s ease;
+}
+.card-infos p {
+    margin: 4px 0;
+    font-weight: bold;
+    font-size: 14px;
+}
 
+.comic-card:hover .card-infos, .serie-card:hover .card-infos , .character-card:hover .card-infos {
+    background: rgba(0, 0, 0, 0.95);
+}
+/* Variant cards */
+.variant-card {
+    background: #f9f9f9;
+    padding: 0.5rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
 
-/**** Comic Details *****/
+.variant-card img {
+    max-width: 100%;
+    border-radius: 4px;
+}
 
+.variant-card p {
+    font-size: 0.9rem;
+    margin: 0.5rem 0 0;
+}
+
+/* ==========================
+   Comic Details
+========================== */
 .comic-detail {
     font-family: 'Arial', sans-serif;
     max-width: 1200px;
@@ -101,7 +171,7 @@ h1 {
 .comic-image img {
     max-width: 300px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
 .comic-info {
@@ -110,9 +180,8 @@ h1 {
 }
 
 .comic-info h1 {
-    margin-top: 0;
+    margin: 0 0 0.5rem 0;
     font-size: 2rem;
-    margin-bottom: 0.5rem;
 }
 
 .comic-info .description {
@@ -120,13 +189,16 @@ h1 {
     margin-bottom: 1rem;
 }
 
-.creators {
+/* ==========================
+   Creators
+========================== */
+.creators, .creators-list ul {
     list-style: none;
     padding: 0;
     margin: 0.5rem 0 1rem;
 }
 
-.creators li {
+.creators li, .creators-list li {
     margin-bottom: 0.3rem;
 }
 
@@ -144,47 +216,54 @@ h1 {
 .serie img {
     max-height: 60px;
     border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
-.comic-variants {
-    margin-top: 2rem;
+.creators-list {
+    max-width: 500px;
+    margin: 0 auto 80px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+    font-weight: bolder;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
-.variant-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
+.sticky-letter {
+    position: sticky;
+    top: 0;
+    background: #141414;
+    color: white;
+    padding: 7px 10px;
+    border-left: 6px solid #e62429;
+    font-size: 28px;
+    text-transform: uppercase;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
-.variant-card {
-    background: #f9f9f9;
-    border-radius: 8px;
-    padding: 0.5rem;
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.variant-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.variant-card img {
-    max-width: 100%;
+.creators-list li a {
+    display: inline-block;
+    color: #fff;
+    text-decoration: none;
+    padding: 7px 10px;
     border-radius: 4px;
+    transition: all 0.2s;
 }
 
-.variant-card p {
-    font-size: 0.9rem;
-    margin: 0.5rem 0 0;
+.creators-list li a:hover {
+    background: rgba(255,255,255,0.2);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
 }
 
+/* ==========================
+   Pagination
+========================== */
 .pagination {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background: rgba(20, 20, 20, 0.95);
+    background: rgba(20,20,20,0.95);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -192,7 +271,7 @@ h1 {
     padding: 12px 0;
     z-index: 1000;
     backdrop-filter: blur(6px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255,255,255,0.1);
 }
 
 .pagination a,
@@ -206,11 +285,11 @@ h1 {
 }
 
 .pagination a {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.1);
 }
 
 .pagination a:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255,255,255,0.25);
     transform: translateY(-2px);
 }
 
@@ -220,92 +299,74 @@ h1 {
     cursor: default;
 }
 
-@media (max-width: 600px) {
-    .pagination {
-        font-size: 0.9rem;
-        gap: 4px;
-        padding: 10px 0;
-    }
-
-    .pagination a,
-    .pagination span.current {
-        padding: 6px 10px;
-    }
+/* ==========================
+   Search bar
+========================== */
+.search-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
+    position: relative;
 }
 
+#search-bar {
+    width: 100%;
+    padding: 12px 16px;
+    padding-right: 40px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 25px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
 
-/* Responsive mobile */
+#search-bar:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 4px 12px rgba(76,175,80,0.5);
+}
+
+#search-bar::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+.search-container::after {
+    content: "🔍";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 18px;
+    color: #888;
+}
+
+/* ==========================
+   Responsive
+========================== */
+@media (max-width: 1200px) {
+    .comic-list, .serie-list { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 992px) {
+    .comic-list, .serie-list { grid-template-columns: repeat(3, 1fr); }
+}
+
 @media (max-width: 768px) {
-    .comic-main {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .comic-image img {
-        max-width: 100%;
-    }
-
-    .comic-info {
-        text-align: center;
-    }
-
-    .variant-list {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    }
+    .comic-main { flex-direction: column; align-items: center; }
+    .comic-image img { max-width: 100%; }
+    .comic-info { text-align: center; }
+    .variant-list { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
 }
 
-
-/***** Creators *****/
-.creators-list {
-    max-width: 500px;
-    margin: 0 auto 80px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-    font-weight: bolder;
-}
-
-
-.sticky-letter {
-    position: sticky;
-    top: 0;
-    background: #141414;
-    color: white;
-    padding: 7px 10px;
-    border-left: 6px solid #e62429;
-    font-size: 28px;
-    text-transform: uppercase;
-    z-index: 10;
-
-}
-
-.creators-list ul {
-    list-style: none;
-    padding: 0;
-    margin: 10px;
-}
-
-.creators-list li {
-    margin: 0.3rem 0;
-}
-
-.creators-list li a {
-    display: inline-block;
-    color: #fff;
-    text-decoration: none;
-    padding: 7px 10px;
-    border-radius: 4px;
-    transition: all 0.2s;
-}
-
-.creators-list li a:hover {
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 2px 2px 0 #000;
-}
-
-/* Responsive */
 @media (max-width: 600px) {
+    .pagination { font-size: 0.9rem; gap: 4px; padding: 10px 0; }
+    .pagination a, .pagination span.current { padding: 6px 10px; }
+    .sticky-letter { font-size: 1.4rem; }
+}
 
-    .sticky-letter {
-        font-size: 1.4rem;
-    }
+@media (max-width: 500px) {
+    .search-container { max-width: 90%; }
+    .comic-list, .serie-list { grid-template-columns: 1fr; }
 }

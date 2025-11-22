@@ -1,8 +1,9 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <input type="text" id="search-bar" placeholder="Rechercher un comic..."
-           value="{{ app.request.query.get('title')|default('') }}"/>
+    <div class="search-container">
+        <input type="text" id="search-bar" placeholder="Search for comics ..."/>
+    </div>
 
     <section class="comic-list" id="comic-list">
         {% include 'comics/_list.html.twig' with {
