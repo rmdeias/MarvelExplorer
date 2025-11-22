@@ -47,7 +47,7 @@ export function createSearch({
 
                 // Pagination AJAX
                 listContainer.querySelectorAll('.pagination a').forEach(link => {
-                    link.addEventListener('click', function(e) {
+                    link.addEventListener('click', function (e) {
                         e.preventDefault();
                         const newPage = parseInt(this.dataset.page);
                         loadItems(currentQuery, newPage);
@@ -60,7 +60,7 @@ export function createSearch({
             });
     }
 
-    searchInput.addEventListener('input', function() {
+    searchInput.addEventListener('input', function () {
         const query = searchInput.value.trim();
         if (query.length < minChars) {
             listContainer.innerHTML = defaultHtml;
