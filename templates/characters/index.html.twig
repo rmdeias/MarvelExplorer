@@ -1,9 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <input type="text" id="search-bar" placeholder="Rechercher un character..."/>
+    <div class="search-container">
+        <input type="text" id="search-bar" placeholder="Search for characters ..."/>
+    </div>
 
-    <section class="comics-list" id="character-list">
+    <section class="character-list" id="character-list">
         {% include 'characters/_list.html.twig' with {
             characters: characters,
             currentPage: currentPage,

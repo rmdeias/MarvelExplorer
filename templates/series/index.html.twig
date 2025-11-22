@@ -1,7 +1,9 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <input type="text" id="search-bar" placeholder="Rechercher un serie..."/>
+    <div class="search-container">
+        <input type="text" id="search-bar" placeholder="Search for series ..."/>
+    </div>
 
     <section class="serie-list" id="serie-list">
         {% include 'series/_list.html.twig' with {
