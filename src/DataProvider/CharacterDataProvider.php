@@ -36,13 +36,14 @@ final readonly class CharacterDataProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $itemsPerPage = $context['filters']['itemsPerPage'] ?? 100;
+        $itemsPerPage = $operation->getPaginationItemsPerPage();
+        $request = $context['request'] ?? null;
 
 
         if ($operation->getName() === 'characters') {
-            $page = $context['filters']['page'] ?? 1;
+            $page = $request?->query->get('page');
             /// Retrieving characters from the repository side with paging and sort them in alphabetical order
-            $characters = $this->characterRepository->findDTOCharacters($page, $itemsPerPage);
+            $characters = $this->characterRepository->findDTOCharacters((int)$page, $itemsPerPage);
             $totalItems = $this->characterRepository->countCharacters()['totalItems'];
             usort($characters, fn($a, $b) => strnatcasecmp($a->name, $b->name));
 
@@ -58,7 +59,7 @@ final readonly class CharacterDataProvider implements ProviderInterface
         // Search characters by name
         if ($operation->getName() === 'searchCharactersByName') {
 
-            $request = $context['request'] ?? null;
+
             $name = $request?->query->get('name', '');
 
             $characters = $this->elasticSearchService->search(

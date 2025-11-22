@@ -34,7 +34,6 @@ final class CharactersFrontController extends AbstractController
      * Fetches the list of characters from the API, sorts them alphabetically by name,
      * and renders the index template.
      *
-     *
      * @param Request $request Symfony HTTP request object
      * @return Response The rendered HTML response
      */

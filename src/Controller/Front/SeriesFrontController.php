@@ -30,22 +30,27 @@ final class SeriesFrontController extends AbstractController
     }
 
     /**
-     * Displays the list of top recent series.
+     * Displays a paginated list of series.
      *
-     * Calls the internal API endpoint '/api/topRecentComics' and passes
-     * the result to the 'series/index.html.twig' template.
+     * This controller fetches series from the API Platform endpoint `/api/series`
+     * using pagination from entity. It also retrieves the total number of
+     * series via the `/api/countFilteredSeries` endpoint to calculate the number of pages.
      *
-     * @param Request $request HTTP request object
-     * @return Response Rendered HTML response with top series
+     * If the current page exceeds the total number of pages, the user is redirected
+     * to the first page.
+     *
+     * @param Request $request The current HTTP request (used to get the page number)
+     *
+     * @return Response The rendered HTML response containing the series list and pagination
      *
      * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     *
      */
     #[Route('/series', name: 'front_series')]
-    public function index(Request $request): Response
+    public function allSeries(Request $request): Response
     {
         $baseUrl = $request->getSchemeAndHttpHost();
         $page = max(1, (int)$request->query->get('page', 1));
@@ -79,7 +84,7 @@ final class SeriesFrontController extends AbstractController
      * Searches for series by title.
      *
      * Reads the 'title' query parameter from the request, calls the internal API
-     * endpoint '/api/searchComicsByTitle', and renders the results in the
+     * endpoint '/api/searchSeriesByTitle', and renders the results in the
      * 'series/_list.html.twig' template.
      * If the title is empty, redirects to the main series page.
      *

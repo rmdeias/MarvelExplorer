@@ -62,17 +62,19 @@ final readonly class ComicDataProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $itemsPerPage = $context['filters']['itemsPerPage'] ?? 100;
+
+        $itemsPerPage = $operation->getPaginationItemsPerPage();
+        $request = $context['request'] ?? null;
 
         if ($operation->getName() === 'topRecentComics') {
             return $this->comicRepository->findTopRecentComics();
         }
 
         if ($operation->getName() === 'comics') {
-            $page = $context['filters']['page'] ?? 1;
+            $page = $request?->query->get('page');
 
             /// Retrieving filtered comics from the repository side with pagination and sort them in alphabetical order
-            $comics = $this->comicRepository->findFilteredComics($page, $itemsPerPage);
+            $comics = $this->comicRepository->findFilteredComics((int)$page, $itemsPerPage);
             usort($comics, fn($a, $b) => strnatcasecmp($a->title, $b->title));
 
             $totalItems = $this->comicRepository->countFilteredComics()['totalItems'];
@@ -87,14 +89,13 @@ final readonly class ComicDataProvider implements ProviderInterface
         }
 
         if ($operation->getName() === 'searchComicsByTitle') {
-            $request = $context['request'] ?? null;
             $title = $request?->query->get('title', '');
 
             $comics = $this->elasticSearchService->search(
                 'comics',
                 'title',
                 $title,
-                ['variant', 'paperback', 'hardcover','mini-poster'],
+                ['variant', 'paperback', 'hardcover', 'mini-poster'],
                 500,
                 fn(array $source) => $this->mapToComicsDTO($source)
             );
