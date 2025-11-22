@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -23,13 +22,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource(
     normalizationContext: ['groups' => ['comic:read']],
     denormalizationContext: ['groups' => ['comic:write']],
-    paginationItemsPerPage: 100,   // 100 comics par page par défaut
-    order: ['title' => 'ASC'],      // tri alphabétique par défaut
+    paginationItemsPerPage: 90,
+    order: ['title' => 'ASC'],
     operations: [
         new GetCollection(
             name: 'comics',
             uriTemplate: '/comics',
-            provider: ComicDataProvider::class
+            provider: ComicDataProvider::class,
         ),
         new GetCollection(
             name: 'searchComicsByTitle',

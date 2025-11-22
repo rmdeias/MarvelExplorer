@@ -64,7 +64,7 @@ class ComicRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the total number of comics excluding variants, paperback, and hardcover editions.
+     * Returns the total number of comics excluding variants, paperback, hardcover and mini-poster editions.
      *
      * @return array{totalItems: int} The total number of filtered comics
      */
@@ -75,15 +75,18 @@ class ComicRepository extends ServiceEntityRepository
             ->where('c.title NOT LIKE :variant')
             ->andWhere('c.title NOT LIKE :paperback')
             ->andWhere('c.title NOT LIKE :hardcover')
+            ->andWhere('c.title NOT LIKE :mini')
             ->setParameter('variant', '%variant%')
             ->setParameter('paperback', '%paperback%')
-            ->setParameter('hardcover', '%hardcover%');
+            ->setParameter('hardcover', '%hardcover%')
+            ->setParameter('mini', '%mini-poster%');
+
         $total = (int)$qb->getQuery()->getSingleScalarResult();
         return ['totalItems' => $total,];
     }
 
     /**
-     * Excludes variants, paperback, and hardcover editions.
+     * Excludes variants, paperback, hardcover and mini-poster editions.
      * Returns an array of ComicsListDTO objects.
      *
      * @return ComicsListDTO[] Array of DTOs containing marvelId, title, date, and thumbnail

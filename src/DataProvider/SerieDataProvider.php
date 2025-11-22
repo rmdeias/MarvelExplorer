@@ -16,6 +16,7 @@ use App\Service\ElasticSearchServices\ElasticSearchService;
  * Handles different operations:
  * - series: returns sort and filtered series
  * - searchSeriesByTitle: searches series by title using Elasticsearch
+ * - seriesByCreator : returns series by creator in creators/{id}-{slug}
  * - default: returns all series
  */
 final readonly class SerieDataProvider implements ProviderInterface
@@ -61,14 +62,14 @@ final readonly class SerieDataProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
 
-        $itemsPerPage = $context['filters']['itemsPerPage'] ?? 100;
+        $itemsPerPage = $operation->getPaginationItemsPerPage();
+        $request = $context['request'] ?? null;
 
         if ($operation->getName() === 'series') {
-            $page = $context['filters']['page'] ?? 1;
-
+            $page = $request?->query->get('page');
 
             /// Retrieving filtered series from the repository side with pagination and sort them in alphabetical order
-            $series = $this->serieRepository->findFilteredSeries($page, $itemsPerPage);
+            $series = $this->serieRepository->findFilteredSeries((int)$page, $itemsPerPage);
             usort($series, fn($a, $b) => strnatcasecmp($a->title, $b->title));
 
             $totalItems = $this->serieRepository->countFilteredSeries()['totalItems'];
@@ -82,14 +83,14 @@ final readonly class SerieDataProvider implements ProviderInterface
         }
 
         if ($operation->getName() === 'searchSeriesByTitle') {
-            $request = $context['request'] ?? null;
+
             $title = $request?->query->get('title', '');
 
             $series = $this->elasticSearchService->search(
                 'series',
                 'title',
                 $title,
-                ['variant', 'paperback', 'hardcover', 'omnibus','mini-poster'],
+                ['variant', 'paperback', 'hardcover', 'omnibus', 'mini-poster'],
                 500,
                 fn(array $source) => $this->mapToSeriesDTO($source)
             );

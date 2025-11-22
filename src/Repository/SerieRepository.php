@@ -35,9 +35,13 @@ class SerieRepository extends ServiceEntityRepository
             ->where('c.title NOT LIKE :variant')
             ->andWhere('c.title NOT LIKE :paperback')
             ->andWhere('c.title NOT LIKE :hardcover')
+            ->andWhere('c.title NOT LIKE :omnibus')
+            ->andWhere('c.title NOT LIKE :mini')
             ->setParameter('variant', '%variant%')
             ->setParameter('paperback', '%paperback%')
-            ->setParameter('hardcover', '%hardcover%');
+            ->setParameter('hardcover', '%hardcover%')
+            ->setParameter('omnibus', '%omnibus%')
+            ->setParameter('mini', '%mini-poster%');
         $total = (int)$qb->getQuery()->getSingleScalarResult();
         return ['totalItems' => $total,];
     }
