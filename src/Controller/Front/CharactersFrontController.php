@@ -110,9 +110,9 @@ final class CharactersFrontController extends AbstractController
         return $this->render('characters/_list.html.twig', [
             'characters' => $characters,
             'currentPage' => $page,
-            'startPage' => $paging['$startPage'],
-            'endPage' => $paging['$endPage'],
-            'totalPages' => $paging['$totalPages'],
+            'startPage' => $paging['startPage'],
+            'endPage' => $paging['endPage'],
+            'totalPages' => $paging['totalPages'],
             'routeName' => 'front_characters_search',
             'searchTitle' => $name,
         ]);

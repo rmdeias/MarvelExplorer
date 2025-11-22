@@ -16,52 +16,24 @@
         } %}
     </section>
 
-    <script>
-        const searchInput = document.getElementById('search-bar');
-        const comicList = document.getElementById('comic-list');
+    <script type="module">
+        import { createSearch } from '/assets/js/searchByTitleOrName.js';
 
-        let currentQuery = '';
-        let currentPage = 1;
-
-        function loadComics(title, page = 1) {
-            currentQuery = title;
-            currentPage = page;
-
-            fetch(`/comics/search?title=${encodeURIComponent(title)}&page=${page}`)
-                .then(res => res.text())
-                .then(html => {
-                    comicList.innerHTML = html;
-
-                    // Pagination AJAX
-                    comicList.querySelectorAll('.pagination a').forEach(link => {
-                        link.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            const newPage = parseInt(this.dataset.page);
-                            loadComics(currentQuery, newPage);
-                        });
-                    });
-                })
-                .catch(err => {
-                    console.error(err);
-                    comicList.innerHTML = '<p>Erreur lors de la récupération des comics.</p>';
-                });
-        }
-
-        searchInput.addEventListener('input', function () {
-            const query = searchInput.value.trim();
-            if (query.length < 3) {
-                comicList.innerHTML = `{% include 'comics/_list.html.twig' with {
-                    comics: comics,
-                    currentPage: currentPage,
-                    startPage: startPage,
-                    endPage: endPage,
-                    totalPages: totalPages,
-                    routeName: routeName|default('front_comics'),
-                    searchTitle: ''
-                } %}`;
-                return;
-            }
-            loadComics(query, 1);
+        createSearch({
+            searchInputSelector: '#search-bar',
+            listContainerSelector: '#comic-list',
+            fetchUrl: '/comics/search',
+            queryParam: 'title',   //
+            minChars: 3,
+            defaultHtml: `{% include 'comics/_list.html.twig' with {
+                comics: comics,
+                currentPage: currentPage,
+                startPage: startPage,
+                endPage: endPage,
+                totalPages: totalPages,
+                routeName: routeName|default('front_comics'),
+                searchTitle: ''
+            } %}`
         });
     </script>
 {% endblock %}
