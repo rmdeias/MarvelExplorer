@@ -15,52 +15,24 @@
         } %}
     </section>
 
-    <script>
-        const searchInput = document.getElementById('search-bar');
-        const characterList = document.getElementById('character-list');
+    <script type="module">
+        import { createSearch } from '/assets/js/searchByTitleOrName.js';
 
-        let currentQuery = '';
-        let currentPage = 1;
-
-        function loadCharacters(name, page = 1) {
-            currentQuery = name;
-            currentPage = page;
-
-            fetch(`/characters/search?name=${encodeURIComponent(name)}&page=${page}`)
-                .then(res => res.text())
-                .then(html => {
-                    characterList.innerHTML = html;
-
-                    // Pagination AJAX
-                    characterList.querySelectorAll('.pagination a').forEach(link => {
-                        link.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            const newPage = parseInt(this.dataset.page);
-                            loadCharacters(currentQuery, newPage);
-                        });
-                    });
-                })
-                .catch(err => {
-                    console.error(err);
-                    characterList.innerHTML = '<p>Erreur lors de la récupération des characters.</p>';
-                });
-        }
-
-        searchInput.addEventListener('input', function () {
-            const query = searchInput.value.trim();
-            if (query.length < 3) {
-                characterList.innerHTML = `{% include 'characters/_list.html.twig' with {
-                    characters: characters,
-                    currentPage: currentPage,
-                    startPage: startPage,
-                    endPage: endPage,
-                    totalPages: totalPages,
-                    routeName: routeName|default('front_characters'),
-                    searchName: ''
-                } %}`;
-                return;
-            }
-            loadCharacters(query, 1);
+        createSearch({
+            searchInputSelector: '#search-bar',
+            listContainerSelector: '#character-list',
+            fetchUrl: '/characters/search',
+            queryParam: 'name',   // <-- ici pour que ça devienne ?name=...
+            minChars: 3,
+            defaultHtml: `{% include 'characters/_list.html.twig' with {
+                characters: characters,
+                currentPage: currentPage,
+                startPage: startPage,
+                endPage: endPage,
+                totalPages: totalPages,
+                routeName: routeName|default('front_characters'),
+                searchName: ''
+            } %}`
         });
     </script>
 

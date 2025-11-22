@@ -15,52 +15,24 @@
         } %}
     </section>
 
-    <script>
-        const searchInput = document.getElementById('search-bar');
-        const serieList = document.getElementById('serie-list');
+    <script type="module">
+        import { createSearch } from '/assets/js/searchByTitleOrName.js';
 
-        let currentQuery = '';
-        let currentPage = 1;
-
-        function loadComics(title, page = 1) {
-            currentQuery = title;
-            currentPage = page;
-
-            fetch(`/series/search?title=${encodeURIComponent(title)}&page=${page}`)
-                .then(res => res.text())
-                .then(html => {
-                    serieList.innerHTML = html;
-
-                    // Pagination AJAX
-                    serieList.querySelectorAll('.pagination a').forEach(link => {
-                        link.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            const newPage = parseInt(this.dataset.page);
-                            loadComics(currentQuery, newPage);
-                        });
-                    });
-                })
-                .catch(err => {
-                    console.error(err);
-                    serieList.innerHTML = '<p>Erreur lors de la récupération des series.</p>';
-                });
-        }
-
-        searchInput.addEventListener('input', function () {
-            const query = searchInput.value.trim();
-            if (query.length < 3) {
-                serieList.innerHTML = `{% include 'series/_list.html.twig' with {
-                    series: series,
-                    currentPage: currentPage,
-                    startPage: startPage,
-                    endPage: endPage,
-                    totalPages: totalPages,
-                    routeName: routeName|default('front_series'),
-                    searchTitle: ''
-                } %}`;
-                return;
-            }
-            loadComics(query, 1);
+        createSearch({
+            searchInputSelector: '#search-bar',
+            listContainerSelector: '#serie-list',
+            fetchUrl: '/series/search',
+            queryParam: 'title',   //
+            minChars: 3,
+            defaultHtml: `{% include 'series/_list.html.twig' with {
+                series: series,
+                currentPage: currentPage,
+                startPage: startPage,
+                endPage: endPage,
+                totalPages: totalPages,
+                routeName: routeName|default('front_series'),
+                searchTitle: ''
+            } %}`
         });
     </script>
 
