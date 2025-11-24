@@ -1,33 +1,28 @@
 {% extends 'base.html.twig' %}
-
 {% block body %}
 
-    <div class="comic-detail">
-        <div class="comic-main">
+    <div class="details">
+        <div class="details-main">
+            <div class="details-info">
 
-            <div class="comic-info">
                 <h1>{{ seriesByCreator.creator }} worked on : </h1>
+                <div class="details-serie-list">
+                    {% if seriesByCreator.series is not empty %}
+                        {% for serie in seriesByCreator.series %}
 
-                {% if seriesByCreator.series is not empty %}
-                    <div class="comic-variants">
-                        <div class="variant-list">
-                            {% for serie in seriesByCreator.series %}
-                                <div class="variant-card">
-                                    <a href="/series/{{ serie.marvelId }}-{{ serie.title|slug|lower }}">
-                                        <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ serie.title }}"></a>
-                                    <p>{{ serie.title }}</p>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
+                            <div class="details-serie-card">
+                                <a href="/series/{{ serie.marvelId }}-{{ serie.title|slug|lower }}">
+                                    <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}"
+                                         alt="{{ serie.title }}"></a>
+                                <p>{{ serie.title }}</p>
+                            </div>
+
+                        {% endfor %}
+                    {% endif %}
+                </div>
 
             </div>
-
         </div>
-
     </div>
-
-
 
 {% endblock %}

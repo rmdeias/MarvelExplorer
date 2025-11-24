@@ -22,7 +22,7 @@
         {% endfor %}
     </div>
     <!-- 🔠 Barre alphabétique -->
-    <div class="pagination">
+    <div class="pagination pagination-creators">
         {% for letter in alphabet %}
             {% if groupedAuthors[letter] is defined %}
                 <a href="#{{ letter }}" class="has-creators">{{ letter }}</a>

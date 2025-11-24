@@ -1,15 +1,19 @@
 {% for character in characters %}
+
     <a href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
         <article class="character-card">
             <img src="{{ character.thumbnail ?: asset('assets/images/character-no-img.jpg') }}"
                  alt="{{ character.name }}">
-            <div class = "card-infos">
+            <div class="card-infos">
                 <p>{{ character.name }}</p>
             </div>
         </article>
     </a>
+
 {% else %}
+
     <p>Aucun character trouvé.</p>
+
 {% endfor %}
 
 <div class="pagination">
@@ -20,7 +24,7 @@
 
     {% if totalPages > 0 %}
         {% if currentPage > 1 %}
-            <a href="{{ path(routeName, queryParams | merge({'page': currentPage - 1})) }}"
+            <a class="previous-button" href="{{ path(routeName, queryParams | merge({'page': currentPage - 1})) }}"
                data-page="{{ currentPage - 1 }}">« Previous</a>
         {% endif %}
 
@@ -33,7 +37,7 @@
         {% endfor %}
 
         {% if currentPage < totalPages %}
-            <a href="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}"
+            <a class="next-button" href="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}"
                data-page="{{ currentPage + 1 }}">Next »</a>
         {% endif %}
         {% if currentPage < totalPages %}

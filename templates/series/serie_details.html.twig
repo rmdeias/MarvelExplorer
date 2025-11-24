@@ -2,65 +2,75 @@
 
 {% block body %}
 
-    <div class="comic-detail">
-        <div class="comic-main">
-            <div class="comic-image">
+    <div class="details">
+        <div class="details-main">
+
+            <div class="details-image">
                 <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ serie.title }}">
             </div>
 
-            <div class="comic-info">
+            <div class="details-info">
                 <h1>{{ serie.title }}</h1>
                 <p class="description">{{ serie.description }}</p>
                 <p>Start year: {{ serie.startYear }}</p>
                 <p>End year: {{ serie.endYear }}</p>
 
                 {% if serie.creators is not empty %}
-                    <ul class="creators">
+
+                    <ul class="details-creators">
                         {% for creator in serie.creators %}
+
                             <li>
-                                <span class="role">{{ creator.role|capitalize }}</span> :
-                               <a href = "/creators/{{ creator.marvelId }}-{{ creator.fullName|slug|lower}}">{{ creator.fullName}}</a>
+                                <span class="role">{{ creator.role|capitalize }}</span>
+                                <a href="/creators/{{ creator.marvelId }}-{{ creator.fullName|slug|lower }}">
+                                    : {{ creator.fullName }}</a>
                             </li>
+
                         {% endfor %}
                     </ul>
+
                 {% endif %}
-
             </div>
-
         </div>
 
         {% if serie.comics is not empty %}
-            <div class="comic-variants">
-                <h2>Comics</h2>
-                <div class="variant-list">
-                    {% for comic in serie.comics %}
-                        {% if  'variant' not in comic.title|lower %}
-                            <div class="variant-card">
-                                <a href="/comics/{{ comic.marvelId }}-{{ comic.title|slug|lower }}">
-                                    <img src="{{ comic.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ comic.title }}"></a>
-                                <p>{{ comic.title }}</p>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+
+            <h2>Comics</h2>
+            <div class="details-comic-list">
+                {% for comic in serie.comics %}
+                    {% if  'variant' not in comic.title|lower %}
+
+                        <div class="details-comic-card">
+                            <a href="/comics/{{ comic.marvelId }}-{{ comic.title|slug|lower }}">
+                                <img src="{{ comic.thumbnail ?: asset('assets/images/no-img.jpg') }}"
+                                     alt="{{ comic.title }}"></a>
+                            <p>{{ comic.title }}</p>
+                        </div>
+
+                    {% endif %}
+                {% endfor %}
             </div>
+
         {% endif %}
 
         {% if serie.characters is not empty %}
-            <div class="comic-variant">
-                <h2>Characters</h2>
-                <div class="variant-list">
-                    {% for character in serie.characters %}
-                        <div class="variant-card">
-                            <a href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
-                                <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
-                                <p>{{ character.name }}</p>
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
+
+            <h2>Characters</h2>
+            <div class="details-character-list">
+                {% for character in serie.characters %}
+
+                    <div class="details-character-card">
+                        <a href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
+                            <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
+                            <p>{{ character.name }}</p>
+                        </a>
+                    </div>
+
+                {% endfor %}
             </div>
+
         {% endif %}
+
     </div>
 
 
