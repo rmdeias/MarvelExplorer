@@ -1,9 +1,9 @@
 {% for serie in series %}
 
     <a href="/series/{{ serie.marvelId }}-{{ serie.title |slug|lower }}">
-        <article class="serie-card">
+        <article class="cover-card">
             <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ serie.title }}">
-            <div class= "card-infos">
+            <div class="card-infos">
                 <p>{{ serie.title }}</p>
             </div>
         </article>
@@ -21,7 +21,7 @@
 
     {% if totalPages > 0 %}
         {% if currentPage > 1 %}
-            <a href="{{ path(routeName, queryParams | merge({'page': currentPage - 1})) }}"
+            <a class="previous-button" href="{{ path(routeName, queryParams | merge({'page': currentPage - 1})) }}"
                data-page="{{ currentPage - 1 }}">« Previous</a>
         {% endif %}
 
@@ -34,8 +34,8 @@
         {% endfor %}
 
         {% if currentPage < totalPages %}
-            <a href="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}"
-               data-page="{{ currentPage + 1 }}">Next »</a>
+            <a class="next-button" href ="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}"
+            data-page="{{ currentPage + 1 }}">Next »</a>
         {% endif %}
         {% if currentPage < totalPages %}
             <a href="{{ path(routeName, queryParams | merge({'page':  totalPages})) }}" data-page="{{ totalPages }}">...Last</a>

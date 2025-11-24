@@ -1,15 +1,19 @@
 {% for comic in comics %}
+
     <a href="/comics/{{ comic.marvelId }}-{{ comic.title |slug|lower }}">
-        <article class="comic-card">
+        <article class="cover-card">
             <img src="{{ comic.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ comic.title }}">
             <div class="card-infos">
                 <p>{{ comic.title }}</p>
-                <p>{{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
+                <p class="card-infos-date">{{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
             </div>
         </article>
     </a>
+
 {% else %}
+
     <p>Aucun comic trouvé.</p>
+
 {% endfor %}
 
 <div class="pagination">
@@ -20,7 +24,7 @@
 
     {% if totalPages > 0 %}
         {% if currentPage > 1 %}
-            <a href="{{ path(routeName, queryParams | merge({'page': currentPage - 1})) }}"
+            <a class="previous-button" href="{{ path(routeName, queryParams | merge({'page': currentPage - 1})) }}"
                data-page="{{ currentPage - 1 }}">« Previous</a>
         {% endif %}
 
@@ -33,7 +37,7 @@
         {% endfor %}
 
         {% if currentPage < totalPages %}
-            <a href="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}"
+            <a class="next-button" href="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}"
                data-page="{{ currentPage + 1 }}">Next »</a>
         {% endif %}
         {% if currentPage < totalPages %}

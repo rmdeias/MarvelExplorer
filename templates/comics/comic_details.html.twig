@@ -2,35 +2,36 @@
 
 {% block body %}
 
-    <div class="comic-detail">
-        <div class="comic-main">
+    <div class="details">
+        <div class="details-main">
             <!-- Image principale -->
-            <div class="comic-image">
+            <div class="details-image">
                 <img src="{{ comic.thumbnail }}" alt="{{ comic.title }}">
             </div>
 
             <!-- Infos du comic -->
-            <div class="comic-info">
+            <div class="details-info">
                 <h1>{{ comic.title }}</h1>
                 <p class="description">{{ comic.description }}</p>
+
                 {% if comic.pageCount > 0 %}
                     <p>pages: {{ comic.pageCount }}</p>
                 {% endif %}
                 <p>date: {{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
 
                 {% if comic.creators is not empty and  comic.creators|length > 0 %}
-                    <ul class="creators">
+                    <ul class="details-creators">
                         {% for creator in comic.creators %}
                             <li>
-                                <span class="role">{{ creator.role|capitalize }}</span> :
-                                <a href = "/creators/{{ creator.marvelId }}-{{ creator.fullName|slug|lower}}">{{ creator.fullName}}</a>
+                                <span class="role">{{ creator.role|capitalize }} </span>
+                                <a href="/creators/{{ creator.marvelId }}-{{ creator.fullName|slug|lower }}">: {{ creator.fullName }}</a>
                             </li>
                         {% endfor %}
                     </ul>
                 {% endif %}
+
                 {% if comic.variants is not empty %}
-                    <div class="comic-variants">
-                        <h2>Variants</h2>
+                        <h2>Variants cover</h2>
                         <div class="variant-list">
                             {% for variant in comic.variants %}
                                 <div class="variant-card">
@@ -39,7 +40,6 @@
                                 </div>
                             {% endfor %}
                         </div>
-                    </div>
                 {% endif %}
             </div>
 
@@ -47,29 +47,26 @@
 
         {% if comic.serie is not empty %}
             <h2>Serie</h2>
-            <a href="/series/{{ comic.serie.marvelId }}-{{ comic.serie.title |slug|lower }}">
-                <div class="comic-card">
-                    <img src="{{ comic.serie.thumbnail ?: asset('assets/images/comic-no-img.jpg') }}"
+            <div class="details-serie-list">
+                <a class="details-serie-card"
+                   href="/series/{{ comic.serie.marvelId }}-{{ comic.serie.title |slug|lower }}">
+                    <img src="{{ comic.serie.thumbnail ?: asset('assets/images/no-img.jpg') }}"
                          alt="{{ comic.serie.title }}">
                     <h3>{{ comic.serie.title }}</h3>
-                    <p>{{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
-                </div>
-            </a>
+                </a>
+            </div>
         {% endif %}
 
         {% if comic.characters is not empty %}
-            <div class="comic-variant">
-                <h2>Characters</h2>
-                <div class="variant-list">
-                    {% for character in comic.characters %}
-                        <div class="variant-card">
-                            <a href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
-                                <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
-                                <p>{{ character.name }}</p>
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
+            <h2>Characters</h2>
+            <div class="details-character-list">
+                {% for character in comic.characters %}
+                    <a class="details-character-card"
+                       href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
+                        <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
+                        <p>{{ character.name }}</p>
+                    </a>
+                {% endfor %}
             </div>
         {% endif %}
     </div>
