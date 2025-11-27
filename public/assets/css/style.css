@@ -141,7 +141,8 @@ h1, h2 {
     min-height: -webkit-fill-available;
 }
 
-.cover-card:hover .card-infos, .character-card:hover .card-infos {
+.cover-card:hover .card-infos, .character-card:hover .card-infos,
+.details-serie-card:hover .card-infos, .details-character-card:hover .card-infos, .details-comic-card:hover .card-infos {
     background: rgba(0, 0, 0, 0.95);
 }
 
