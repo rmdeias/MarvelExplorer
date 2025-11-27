@@ -6,7 +6,7 @@
         <div class="details-main">
             <!-- Image principale -->
             <div class="details-image">
-                <img src="{{ comic.thumbnail?: asset('assets/images/no-img.jpg')}}" alt="{{ comic.title }}">
+                <img id ="main-cover" src="{{ comic.thumbnail?: asset('assets/images/no-img.jpg')}}" alt="{{ comic.title }}">
             </div>
 
             <!-- Infos du comic -->
@@ -34,8 +34,8 @@
                     <h2>Variants cover</h2>
                     <div class="variant-list">
                         {% for variant in comic.variants %}
-                            <div class="variant-card">
-                                <img src="{{ variant.thumbnail }}" alt="{{ variant.title }}">
+                            <div class="variant-card" data-cover="{{ variant.thumbnail }}">
+                                <img class="variant-cover" src="{{ variant.thumbnail }}" alt="{{ variant.title }}">
                                 <p>{{ variant.title }}</p>
                             </div>
                         {% endfor %}
@@ -74,6 +74,8 @@
             </div>
         {% endif %}
     </div>
+
+    <script src="{{ asset('assets/js/changeMainCoverForVariantCover.js') }}"></script>
 
 
 
