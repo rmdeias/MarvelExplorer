@@ -6,7 +6,7 @@
         <div class="details-main">
             <!-- Image principale -->
             <div class="details-image">
-                <img src="{{ comic.thumbnail }}" alt="{{ comic.title }}">
+                <img src="{{ comic.thumbnail?: asset('assets/images/no-img.jpg')}}" alt="{{ comic.title }}">
             </div>
 
             <!-- Infos du comic -->
@@ -31,15 +31,15 @@
                 {% endif %}
 
                 {% if comic.variants is not empty %}
-                        <h2>Variants cover</h2>
-                        <div class="variant-list">
-                            {% for variant in comic.variants %}
-                                <div class="variant-card">
-                                    <img src="{{ variant.thumbnail }}" alt="{{ variant.title }}">
-                                    <p>{{ variant.title }}</p>
-                                </div>
-                            {% endfor %}
-                        </div>
+                    <h2>Variants cover</h2>
+                    <div class="variant-list">
+                        {% for variant in comic.variants %}
+                            <div class="variant-card">
+                                <img src="{{ variant.thumbnail }}" alt="{{ variant.title }}">
+                                <p>{{ variant.title }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
                 {% endif %}
             </div>
 
@@ -52,7 +52,9 @@
                    href="/series/{{ comic.serie.marvelId }}-{{ comic.serie.title |slug|lower }}">
                     <img src="{{ comic.serie.thumbnail ?: asset('assets/images/no-img.jpg') }}"
                          alt="{{ comic.serie.title }}">
-                    <h3>{{ comic.serie.title }}</h3>
+                    <div class="card-infos">
+                        <h3>{{ comic.serie.title }}</h3>
+                    </div>
                 </a>
             </div>
         {% endif %}
@@ -64,7 +66,9 @@
                     <a class="details-character-card"
                        href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
                         <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
-                        <p>{{ character.name }}</p>
+                        <div class="card-infos">
+                            <p>{{ character.name }}</p>
+                        </div>
                     </a>
                 {% endfor %}
             </div>
