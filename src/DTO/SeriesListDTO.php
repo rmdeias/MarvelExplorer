@@ -30,10 +30,11 @@ class SeriesListDTO
     #[Groups(['serie:read'])]
     public string $thumbnail;
 
-    public function __construct(int $marvelId, string $title, string $thumbnail)
+
+    public function __construct(int $marvelId, string $title, ?string $thumbnail, ?string $cover = null)
     {
         $this->marvelId = $marvelId;
         $this->title = $title;
-        $this->thumbnail = $thumbnail;
+        $this->thumbnail = !empty($thumbnail) ? $thumbnail : ($cover ?? '');
     }
 }

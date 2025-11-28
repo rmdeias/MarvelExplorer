@@ -30,21 +30,33 @@ class SerieRepository extends ServiceEntityRepository
      */
     public function countFilteredSeries(): array
     {
-        $qb = $this->createQueryBuilder('c');
-        $qb->select('count(c.marvelId)')
-            ->where('c.title NOT LIKE :variant')
-            ->andWhere('c.title NOT LIKE :paperback')
-            ->andWhere('c.title NOT LIKE :hardcover')
-            ->andWhere('c.title NOT LIKE :omnibus')
-            ->andWhere('c.title NOT LIKE :mini')
-            ->setParameter('variant', '%variant%')
-            ->setParameter('paperback', '%paperback%')
-            ->setParameter('hardcover', '%hardcover%')
-            ->setParameter('omnibus', '%omnibus%')
-            ->setParameter('mini', '%mini-poster%');
+        $qb = $this->createQueryBuilder('s');
+
+        // Count distinct pour éviter de compter plusieurs fois une série liée à plusieurs comics
+        $qb->select('COUNT(DISTINCT s.id)')
+            ->innerJoin('s.comics', 'co')
+            ->andWhere("co.title LIKE '%#1%'");
+
+        // Mots à exclure
+        $excludeWords = [
+            'variant' => '%variant%',
+            'paperback' => '%paperback%',
+            'hardcover' => '%hardcover%',
+            'omnibus' => '%omnibus%',
+            'mini' => '%mini-poster%'
+        ];
+
+        foreach ($excludeWords as $param => $value) {
+            $qb->andWhere('s.title NOT LIKE :' . $param)
+                ->andWhere('co.title NOT LIKE :' . $param)
+                ->setParameter($param, $value);
+        }
+
         $total = (int)$qb->getQuery()->getSingleScalarResult();
-        return ['totalItems' => $total,];
+
+        return ['totalItems' => $total];
     }
+
 
     /**
      * Excludes variants, paperback, and hardcover editions.
@@ -54,46 +66,69 @@ class SerieRepository extends ServiceEntityRepository
      */
     public function findFilteredSeries(int $page, int $itemsPerPage): array
     {
-        $qb = $this->createQueryBuilder('c');
-        $qb->select('c.marvelId', 'c.title', 'c.thumbnail')
-            ->where('c.title NOT LIKE :variant')
-            ->andWhere('c.title NOT LIKE :paperback')
-            ->andWhere('c.title NOT LIKE :hardcover')
-            ->andWhere('c.title NOT LIKE :omnibus')
-            ->andWhere('c.title NOT LIKE :mini')
-            ->setParameter('variant', '%variant%')
-            ->setParameter('paperback', '%paperback%')
-            ->setParameter('hardcover', '%hardcover%')
-            ->setParameter('omnibus', '%omnibus%')
-            ->setParameter('mini', '%mini-poster%')
-            ->orderBy('c.title', 'ASC')
-            ->setFirstResult(($page - 1) * $itemsPerPage)->setMaxResults($itemsPerPage);
+        $qb = $this->createQueryBuilder('s');
+
+        $qb->select('s.marvelId', 's.title', 's.thumbnail', 'MIN(co.thumbnail) AS cover')
+            ->innerJoin('s.comics', 'co')
+            ->andWhere("co.title LIKE '%#1%'");
+
+        $excludeWords = [
+            'variant' => '%variant%',
+            'paperback' => '%paperback%',
+            'hardcover' => '%hardcover%',
+            'omnibus' => '%omnibus%',
+            'mini' => '%mini-poster%'
+        ];
+
+        foreach ($excludeWords as $param => $value) {
+            $qb->andWhere('s.title NOT LIKE :' . $param)
+                ->andWhere('co.title NOT LIKE :' . $param)
+                ->setParameter($param, $value);
+        }
+
+        // Important : GROUP BY pour éviter les doublons
+        $qb->groupBy('s.id');
+
+        $qb->orderBy('s.title', 'ASC')
+            ->setFirstResult(($page - 1) * $itemsPerPage)
+            ->setMaxResults($itemsPerPage);
+
         $results = $qb->getQuery()->getResult();
+
         return array_map(fn($r) => new SeriesListDTO(
             $r['marvelId'],
             $r['title'],
-            $r['thumbnail']
+            $r['thumbnail'],
+            $r['cover']
         ), $results);
-
     }
+
 
     public function findSeriesByCreatorId(int $creatorId): array
     {
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = '
-        SELECT marvel_id, title, thumbnail
-        FROM serie
-        WHERE JSON_CONTAINS(creators, :creator, "$")
-        and title NOT LIKE :variant
-        and title NOT LIKE :paperback
-        and title NOT LIKE :hardcover
-        and title NOT LIKE :omnibus
-        and title NOT LIKE :mini';
+        SELECT
+            s.marvel_id,
+            s.title,
+            s.thumbnail,
+            MIN(c.thumbnail) AS cover
+        FROM serie s
+        INNER JOIN comic c ON c.serie_id = s.id
+        WHERE JSON_CONTAINS(s.creators, :creator, "$")
+          AND s.title NOT LIKE :variant
+          AND s.title NOT LIKE :paperback
+          AND s.title NOT LIKE :hardcover
+          AND s.title NOT LIKE :omnibus
+          AND s.title NOT LIKE :mini
+          AND c.title LIKE :first
+        GROUP BY s.id, s.marvel_id, s.title, s.thumbnail
+        ORDER BY s.title ASC
+    ';
 
         $stmt = $conn->prepare($sql);
 
-        // IMPORTANT : json_encode le paramètre
         $result = $stmt->executeQuery([
             'creator' => json_encode(['marvelCreatorId' => (int)$creatorId]),
             'variant' => '%variant%',
@@ -101,7 +136,7 @@ class SerieRepository extends ServiceEntityRepository
             'hardcover' => '%hardcover%',
             'omnibus' => '%omnibus%',
             'mini' => '%mini-poster%',
-
+            'first' => '%#1%'
         ]);
 
         $rows = $result->fetchAllAssociative();
@@ -109,9 +144,11 @@ class SerieRepository extends ServiceEntityRepository
         return array_map(fn($r) => new SeriesListDTO(
             $r['marvel_id'],
             $r['title'],
-            $r['thumbnail']
+            $r['thumbnail'], // thumbnail de la série
+            $r['cover']      // fallback : thumbnail du comic
         ), $rows);
     }
+
 
 
 
