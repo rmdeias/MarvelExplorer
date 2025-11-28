@@ -23,6 +23,7 @@ a {
     background: linear-gradient(90deg, #660000, #330000, #1a0000);
     border-bottom: 2px solid #990000;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
 }
 
 .navbar .nav-link {
