@@ -35,7 +35,7 @@ class SerieRepository extends ServiceEntityRepository
         // Count distinct pour éviter de compter plusieurs fois une série liée à plusieurs comics
         $qb->select('COUNT(DISTINCT s.id)')
             ->innerJoin('s.comics', 'co')
-            ->andWhere("co.title LIKE '%#1%'");
+            ->andWhere("co.title LIKE '%#1'");
 
         // Mots à exclure
         $excludeWords = [
@@ -70,7 +70,7 @@ class SerieRepository extends ServiceEntityRepository
 
         $qb->select('s.marvelId', 's.title', 's.thumbnail', 'MIN(co.thumbnail) AS cover')
             ->innerJoin('s.comics', 'co')
-            ->andWhere("co.title LIKE '%#1%'");
+            ->andWhere("co.title LIKE '%#1'");
 
         $excludeWords = [
             'variant' => '%variant%',
@@ -99,7 +99,7 @@ class SerieRepository extends ServiceEntityRepository
             $r['marvelId'],
             $r['title'],
             $r['thumbnail'],
-            $r['cover']
+        //$r['cover']
         ), $results);
     }
 
@@ -136,7 +136,7 @@ class SerieRepository extends ServiceEntityRepository
             'hardcover' => '%hardcover%',
             'omnibus' => '%omnibus%',
             'mini' => '%mini-poster%',
-            'first' => '%#1%'
+            'first' => '%#1'
         ]);
 
         $rows = $result->fetchAllAssociative();
@@ -145,16 +145,31 @@ class SerieRepository extends ServiceEntityRepository
             $r['marvel_id'],
             $r['title'],
             $r['thumbnail'], // thumbnail de la série
-            $r['cover']      // fallback : thumbnail du comic
+        //$r['cover']      // fallback : thumbnail du comic
         ), $rows);
     }
 
+    /*
 
+    make this update manually for fix empty cover with first comic cover if you want after run all fixtures but all is already in dump.sql
 
+    update serie s
+        INNER JOIN comic co ON co.serie_id = s.id
+    set s.thumbnail = co.thumbnail
+    WHERE co.title LIKE '%#1'
+      AND s.thumbnail = ''
+      AND s.title NOT LIKE '%variant%'
+      AND co.title NOT LIKE '%variant%'
+      AND s.title NOT LIKE '%paperback%'
+      AND co.title NOT LIKE '%paperback%'
+      AND s.title NOT LIKE '%hardcover%'
+      AND co.title NOT LIKE '%hardcover%'
+      AND s.title NOT LIKE '%omnibus%'
+      AND co.title NOT LIKE '%omnibus%'
+      AND s.title NOT LIKE '%mini-poster%'
+      AND co.title NOT LIKE '%mini-poster%';
 
-
-
-
+     */
 
     //    /**
     //     * @return Serie[] Returns an array of Serie objects

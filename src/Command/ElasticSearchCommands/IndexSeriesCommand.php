@@ -60,22 +60,38 @@ class IndexSeriesCommand extends Command
         $i = 0;
 
         $em = $this->serieRepository->getEntityManager();
+        $connection = $em->getConnection();
 
-        $qb = $this->serieRepository->createQueryBuilder('c')
-            ->select(
-                'c.marvelId AS marvelId',
-                'c.title AS title',
-                'c.thumbnail AS thumbnail'
-            );
+        // Native SQL to retrieve all series starting with the first comic #1
+        $sql = "
+        SELECT s.marvel_id AS marvelId, s.title,s.thumbnail,
+        (
+            SELECT MIN(c2.title)
+            FROM comic c2
+            WHERE c2.serie_id = s.id
+              AND c2.title LIKE '%#1'
+        ) AS first_comic_title
+        FROM serie s
+        WHERE EXISTS (
+            SELECT 1
+            FROM comic c2
+            WHERE c2.serie_id = s.id
+              AND c2.title LIKE '%#1'
+        )";
 
-        foreach ($qb->getQuery()->toIterable([], \Doctrine\ORM\Query::HYDRATE_SCALAR) as $serieData) {
+
+        $stmt = $connection->executeQuery($sql);
+
+        while ($serieData = $stmt->fetchAssociative()) {
+
             $client->index([
                 'index' => 'series',
-                'id'    => $serieData['marvelId'],
-                'body'  => [
+                'id' => $serieData['marvelId'],
+                'body' => [
                     'marvelId' => $serieData['marvelId'],
-                    'title'    => $serieData['title'],
-                    'thumbnail'=> $serieData['thumbnail'],
+                    'title' => $serieData['title'],
+                    'thumbnail' => $serieData['thumbnail'],
+                    'first_comic_title' => $serieData['first_comic_title'],
                 ],
             ]);
 

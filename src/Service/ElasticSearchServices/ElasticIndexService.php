@@ -44,20 +44,26 @@ readonly class ElasticIndexService
         $client = $this->getClient();
         $indexName = 'comics';
 
-        $exists = $client->indices()->exists(['index' => $indexName]);
-        if ($exists->asBool()) {
-            return; // Index already exists
+
+        if ($client->indices()->exists(['index' => $indexName])) {
+            $client->indices()->delete(['index' => $indexName]);
         }
 
+        // Recréer l'index proprement
         $client->indices()->create([
             'index' => $indexName,
             'body' => [
                 'mappings' => [
                     'properties' => [
                         'marvelId' => ['type' => 'integer'],
-                        'title'    => ['type' => 'text', 'fields' => ['keyword' => ['type' => 'keyword']]],
-                        'date'     => ['type' => 'date'],
-                        'thumbnail'=> ['type' => 'keyword'],
+                        'title'    => [
+                            'type' => 'text',
+                            'fields' => [
+                                'keyword' => ['type' => 'keyword']
+                            ]
+                        ],
+                        'date' => ['type' => 'date'],
+                        'thumbnail' => ['type' => 'keyword'],
                     ],
                 ],
             ],
@@ -74,9 +80,8 @@ readonly class ElasticIndexService
         $client = $this->getClient();
         $indexName = 'series';
 
-        $exists = $client->indices()->exists(['index' => $indexName]);
-        if ($exists->asBool()) {
-            return; // Index already exists
+        if ($client->indices()->exists(['index' => $indexName])) {
+            $client->indices()->delete(['index' => $indexName]);
         }
 
         $client->indices()->create([
@@ -102,9 +107,8 @@ readonly class ElasticIndexService
         $client = $this->getClient();
         $indexName = 'characters';
 
-        $exists = $client->indices()->exists(['index' => $indexName]);
-        if ($exists->asBool()) {
-            return; // Index already exists
+        if ($client->indices()->exists(['index' => $indexName])) {
+            $client->indices()->delete(['index' => $indexName]);
         }
 
         $client->indices()->create([

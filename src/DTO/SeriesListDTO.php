@@ -31,10 +31,11 @@ class SeriesListDTO
     public string $thumbnail;
 
 
-    public function __construct(int $marvelId, string $title, ?string $thumbnail, ?string $cover = null)
+    public function __construct(int $marvelId, string $title, ?string $thumbnail/*,?string $cover = null*/)
     {
         $this->marvelId = $marvelId;
         $this->title = $title;
-        $this->thumbnail = !empty($thumbnail) ? $thumbnail : ($cover ?? '');
+        //$this->thumbnail = !empty($thumbnail) ? $thumbnail : ($cover ?? '');
+        $this->thumbnail = $thumbnail;
     }
 }
