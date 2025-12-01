@@ -35,3 +35,9 @@ services:
     App\DataFixtures\:
         resource: '../src/DataFixtures'
         tags: [ 'doctrine.fixture.orm' ]
+
+
+    App\Service\CacheService:
+        arguments:
+            $cache: '@cache.app'
+
