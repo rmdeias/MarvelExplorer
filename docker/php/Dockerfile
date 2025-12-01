@@ -4,8 +4,8 @@ FROM php:8.3-fpm
 RUN apt-get update && apt-get install -y \
     git unzip libicu-dev libpq-dev libzip-dev zip curl libxml2-dev bash \
     && docker-php-ext-install intl pdo pdo_mysql zip opcache \
-    && pecl install apcu \
-    && docker-php-ext-enable apcu
+    && pecl install apcu redis \
+    && docker-php-ext-enable apcu redis
 
 # Installer Composer
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
@@ -18,6 +18,7 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash \
 
 # Vérification
 RUN symfony -v || echo "Symfony CLI installed."
+
 
 # Créer le dossier de travail
 WORKDIR /var/www/html

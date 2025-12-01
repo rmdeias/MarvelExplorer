@@ -12,6 +12,7 @@ services:
         depends_on:
             - db
             - elasticsearch
+            - redis
         environment:
             DATABASE_URL: "mysql://remi:password@db:3306/MarvelExplorer?serverVersion=8.0"
             ELASTICSEARCH_HOST: "http://elasticsearch:9200"
@@ -57,6 +58,18 @@ services:
         volumes:
             - es_data:/usr/share/elasticsearch/data
 
+    # --- Redis ---
+
+    redis:
+        image: redis:7-alpine
+        container_name: marvel_redis
+        ports:
+            - "6379:6379"
+        command: [ "redis-server", "--appendonly", "yes" ] # AOF pour persistance
+        volumes:
+            - redis_data:/data
+
 volumes:
     db_data:
     es_data:
+    redis_data:
