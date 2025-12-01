@@ -29,7 +29,7 @@ class ComicRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the top 21 most recent comics.
+     * Returns the top 30 most recent comics.
      *
      * Excludes variants, paperback, and hardcover editions.
      *
@@ -50,7 +50,7 @@ class ComicRepository extends ServiceEntityRepository
             ->setParameter('paperback', '%paperback%')
             ->setParameter('hardcover', '%hardcover%')
             ->orderBy('c.date', 'DESC')
-            ->setMaxResults(21);
+            ->setMaxResults(30);
 
         $results = $qb->getQuery()->getResult();
 
