@@ -22,8 +22,8 @@ symfony console make:migration
 
 symfony console doctrine:migrations:migrate
 
-## Marvel api data to db
-
+## Marvel api data to db 
+### (since october 2025 the official Marvel API is in error 500 is better to use marvel_dump.sql to have all datas)
 symfony console doctrine:fixtures:load --append --group=characters
 
 symfony console doctrine:fixtures:load --append --group=comics
