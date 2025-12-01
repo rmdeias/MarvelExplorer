@@ -2,8 +2,10 @@
 
 namespace App\Controller\Front;
 
+use App\Service\CacheService;
 use App\Service\ExtractCreatorService;
 use App\Service\PagingService;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,39 +17,49 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * Class SeriesFrontController
+ *
+ * Handles frontend operations related to comic series.
+ *
+ * Provides functionalities to:
+ * - Display paginated series lists
+ * - Search series by title
+ * - Display detailed series pages
+ *
+ * Communicates with the internal API using HttpClientInterface and caches results via CacheService.
+ */
 final class SeriesFrontController extends AbstractController
 {
     /**
-     * ComicsFrontController constructor.
+     * SeriesFrontController constructor.
      *
-     * @param HttpClientInterface $client Http client used to call internal API endpoints
+     * @param HttpClientInterface $client Http client for internal API requests
+     * @param ExtractCreatorService $extractCreatorsService Service to enrich creator information
+     * @param PagingService $pagingService Service to calculate pagination
+     * @param CacheService $cacheService Service for caching API results
      */
     public function __construct(
         private readonly HttpClientInterface   $client,
         private readonly ExtractCreatorService $extractCreatorsService,
-        private readonly PagingService         $pagingService)
+        private readonly PagingService         $pagingService,
+        private readonly CacheService          $cacheService
+    )
     {
     }
 
     /**
-     * Displays a paginated list of series.
+     * Displays a paginated list of comic series.
      *
-     * This controller fetches series from the API Platform endpoint `/api/series`
-     * using pagination from entity. It also retrieves the total number of
-     * series via the `/api/countFilteredSeries` endpoint to calculate the number of pages.
+     * Fetches series from the API endpoint `/api/series` and caches the results for 1 hour.
+     * Calculates pagination and ensures the requested page is within valid range.
      *
-     * If the current page exceeds the total number of pages, the user is redirected
-     * to the first page.
+     * @param Request $request Symfony HTTP request object
+     * @return Response Rendered HTML response containing series list and pagination
      *
-     * @param Request $request The current HTTP request (used to get the page number)
-     *
-     * @return Response The rendered HTML response containing the series list and pagination
-     *
-     * @throws TransportExceptionInterface
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     *
+     * @throws ServerExceptionInterface|InvalidArgumentException
      */
     #[Route('/series', name: 'front_series')]
     public function allSeries(Request $request): Response
@@ -55,14 +67,18 @@ final class SeriesFrontController extends AbstractController
         $baseUrl = $request->getSchemeAndHttpHost();
         $page = max(1, (int)$request->query->get('page', 1));
 
-        $response = $this->client->request('GET', $baseUrl . '/api/series', [
-            'query' => ['page' => $page]
-        ]);
-        $datas = $response->toArray();
+        $cacheKey = 'series_page_' . $page;
 
-        $totalItems = $datas['member'][0];
-        $itemsPerPage = $datas['member'][1];
-        $series = $datas['member'][2];
+        $datas = $this->cacheService->get($cacheKey, function () use ($baseUrl, $page) {
+            $response = $this->client->request('GET', $baseUrl . '/api/series', [
+                'query' => ['page' => $page]
+            ]);
+            return $response->toArray()['member'] ?? [];
+        }); // TTL 1 hour
+
+        $totalItems = $datas[0];
+        $itemsPerPage = $datas[1];
+        $series = $datas[2];
 
         $paging = $this->pagingService->paging($totalItems, $page, $itemsPerPage, 8);
 
@@ -70,32 +86,27 @@ final class SeriesFrontController extends AbstractController
             return $this->redirectToRoute('front_series');
         }
 
-
         return $this->render('series/index.html.twig', [
             'series' => $series,
             'currentPage' => $page,
             'startPage' => $paging['startPage'],
             'endPage' => $paging['endPage'],
-            'totalPages' => $paging['totalPages']
+            'totalPages' => $paging['totalPages'],
         ]);
     }
 
     /**
      * Searches for series by title.
      *
-     * Reads the 'title' query parameter from the request, calls the internal API
-     * endpoint '/api/searchSeriesByTitle', and renders the results in the
-     * 'series/_list.html.twig' template.
-     * If the title is empty, redirects to the main series page.
+     * Fetches results from `/api/searchSeriesByTitle` endpoint and caches them for 5 minutes.
+     * Paginates the search results for display.
      *
-     * @param Request $request HTTP request object
+     * @param Request $request Symfony HTTP request object
      * @return Response Rendered HTML response with search results
      *
-     * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|InvalidArgumentException
      */
     #[Route('/series/search', name: 'front_series_search', methods: ['GET'])]
     public function search(Request $request): Response
@@ -107,18 +118,22 @@ final class SeriesFrontController extends AbstractController
 
         $page = max(1, (int)$request->query->get('page', 1));
         $baseUrl = $request->getSchemeAndHttpHost();
-        $response = $this->client->request('GET', $baseUrl . '/api/searchSeriesByTitle?title=' . urlencode($title), [
-            'query' => [
-                'title' => urlencode($title),
-                'page' => $page,
-            ]
-        ]);
 
-        $datas = $response->toArray();
-        $itemsPerPage = $datas['member'][0];
-        $seriesResearch = $datas['member'][1];
+        $cacheKey = 'search_series_' . $title . '_page_' . $page;
 
-        //Clip results for the current page
+        $datas = $this->cacheService->get($cacheKey, function () use ($baseUrl, $title, $page) {
+            $response = $this->client->request('GET', $baseUrl . '/api/searchSeriesByTitle', [
+                'query' => [
+                    'title' => urlencode($title),
+                    'page' => $page,
+                ]
+            ]);
+            return $response->toArray()['member'];
+        }, 300); // TTL 5 minutes
+
+        $itemsPerPage = $datas[0];
+        $seriesResearch = $datas[1];
+
         $offset = ($page - 1) * $itemsPerPage;
         $series = array_slice($seriesResearch, $offset, $itemsPerPage);
         $totalItems = count($seriesResearch);
@@ -137,15 +152,14 @@ final class SeriesFrontController extends AbstractController
     }
 
     /**
-     * Serie page details.
+     * Displays detailed information for a single series.
      *
-     * Reads the 'id' query parameter from the request, calls the internal API
-     * endpoint '/api/series/{id}-{slug}', and renders the results in the
-     * 'series/serie_details.html.twig' template.
-     * If the id is empty, redirects to the main series page.
+     * Fetches series details from `/api/series/{id}` endpoint and enriches creator information.
+     * Sorts associated comics alphabetically by title.
      *
-     * @param Request $request HTTP request object
-     * @return Response Rendered HTML response with search results
+     * @param Request $request Symfony HTTP request object
+     * @param string $id Marvel ID of the series
+     * @return Response Rendered HTML response for the series details
      *
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
@@ -156,7 +170,6 @@ final class SeriesFrontController extends AbstractController
     #[Route('/series/{id}-{slug}', name: 'serie_details', methods: ['GET'])]
     public function serieDetails(Request $request, string $id): Response
     {
-
         if (empty($id)) {
             return $this->redirectToRoute('front_series');
         }
@@ -165,10 +178,10 @@ final class SeriesFrontController extends AbstractController
         $response = $this->client->request('GET', $baseUrl . '/api/series/' . urlencode($id));
         $serieDetailsData = $response->toArray();
 
+        // Sort comics alphabetically
         usort($serieDetailsData['comics'], fn($a, $b) => strnatcasecmp($a['title'], $b['title']));
 
         $serieDetailsData = $this->extractCreatorsService->enrichCreators($serieDetailsData, $baseUrl);
-
 
         return $this->render('series/serie_details.html.twig', [
             'serie' => $serieDetailsData,
