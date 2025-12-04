@@ -10,7 +10,9 @@
     </a>
 
 {% else %}
-    <p>Aucun serie trouvé.</p>
+
+    {% include '_bad_research.html.twig' %}
+
 {% endfor %}
 
 <div class="pagination">
@@ -34,8 +36,8 @@
         {% endfor %}
 
         {% if currentPage < totalPages %}
-            <a class="next-button" href ="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}"
-            data-page="{{ currentPage + 1 }}">»</a>
+            <a class="next-button" href="{{ path(routeName, queryParams | merge({'page': currentPage + 1})) }}"
+               data-page="{{ currentPage + 1 }}">»</a>
         {% endif %}
         {% if currentPage < totalPages %}
             <a href="{{ path(routeName, queryParams | merge({'page':  totalPages})) }}" data-page="{{ totalPages }}">...Last</a>

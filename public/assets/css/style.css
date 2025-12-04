@@ -101,7 +101,7 @@ h1, h2 {
     height: 410px;
 }
 
-.character-card , .details-character-card{
+.character-card, .details-character-card {
     height: 280px;
 }
 
@@ -115,6 +115,27 @@ h1, h2 {
 .details-serie-card img, .details-character-card img, .details-comic-card img {
     width: 100%;
     border-radius: 6px;
+}
+
+.bad-research {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.bad-research img {
+    max-width: 200px;
+    margin-bottom: 20px;
+}
+
+.bad-research p {
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
 /* ==========================
