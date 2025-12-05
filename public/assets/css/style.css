@@ -207,7 +207,12 @@ h2, h1 {
     font-weight: bold;
     cursor: pointer;
 }
+
 /******************************/
+
+#main-cover , .variant-list {
+    cursor: pointer;
+}
 
 .title-mobile {
     display: none;
