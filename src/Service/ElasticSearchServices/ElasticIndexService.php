@@ -44,10 +44,7 @@ readonly class ElasticIndexService
         $client = $this->getClient();
         $indexName = 'comics';
 
-
-        if ($client->indices()->exists(['index' => $indexName])) {
-            $client->indices()->delete(['index' => $indexName]);
-        }
+        $client->indices()->delete(['index' => $indexName]);
 
         // Recréer l'index proprement
         $client->indices()->create([
@@ -80,9 +77,7 @@ readonly class ElasticIndexService
         $client = $this->getClient();
         $indexName = 'series';
 
-        if ($client->indices()->exists(['index' => $indexName])) {
-            $client->indices()->delete(['index' => $indexName]);
-        }
+        $client->indices()->delete(['index' => $indexName]);
 
         $client->indices()->create([
             'index' => $indexName,
@@ -107,9 +102,7 @@ readonly class ElasticIndexService
         $client = $this->getClient();
         $indexName = 'characters';
 
-        if ($client->indices()->exists(['index' => $indexName])) {
-            $client->indices()->delete(['index' => $indexName]);
-        }
+        $client->indices()->delete(['index' => $indexName]);
 
         $client->indices()->create([
             'index' => $indexName,
