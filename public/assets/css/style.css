@@ -127,19 +127,15 @@ h2, h1 {
     align-items: center;
     justify-content: center;
     /*background: rgba(0, 0, 0, 0.8);*/
-    padding: 20px;
     border-radius: 20px;
 }
 
 .bad-research img {
-    max-width: 200px;
     margin-bottom: 20px;
+    max-width: 500px;
+    width: 100%;
 }
 
-.bad-research p {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
 
 /* ==========================
    Card Infos
@@ -176,6 +172,7 @@ h2, h1 {
    Details Pages
 ========================== */
 
+/*** Modal ***/
 .modal {
     display: none;
     position: fixed;
@@ -210,7 +207,7 @@ h2, h1 {
     font-weight: bold;
     cursor: pointer;
 }
-
+/******************************/
 
 .title-mobile {
     display: none;

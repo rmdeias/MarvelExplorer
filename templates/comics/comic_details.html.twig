@@ -75,7 +75,7 @@
                     {% for character in comic.characters %}
                         <a class="details-character-card"
                            href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
-                            <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
+                            <img src="{{ character.thumbnail  ?: asset('assets/images/character-no-img.jpg') }}" alt="{{ character.name }}">
                             <div class="card-infos">
                                 <p>{{ character.name }}</p>
                             </div>

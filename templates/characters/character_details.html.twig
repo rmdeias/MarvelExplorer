@@ -5,7 +5,7 @@
         <div class="details-main">
 
             <div class="details-image">
-                <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
+                <img src="{{ character.thumbnail  ?: asset('assets/images/character-no-img.jpg')}}" alt="{{ character.name }}">
             </div>
 
             <div class="details-info">
@@ -24,7 +24,7 @@
                             <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}"
                                  alt="{{ serie.title }}">
                             <div class="card-infos">
-                                <h3>{{ serie.title }}</h3>
+                                <p>{{ serie.title }}</p>
                             </div>
                         </a>
                     {% endfor %}
