@@ -24,6 +24,7 @@ a {
     border-bottom: 2px solid #990000;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     font-weight: bold;
+    text-transform: uppercase;
 }
 
 .navbar .nav-link {
@@ -169,9 +170,48 @@ h2, h1 {
     background: rgba(0, 0, 0, 0.95);
 }
 
+
+
 /* ==========================
    Details Pages
 ========================== */
+
+.modal {
+    display: none;
+    position: fixed;
+    padding-top: 60px;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 500px;
+    padding: 10px;
+    background:rgba(255, 255, 255, 0.1) ;
+}
+
+#caption {
+    margin: auto;
+    display: block;
+    text-align: center;
+    font-weight: bolder;
+    color: #fff;
+    padding: 10px 0;
+}
+
+.close {
+    position: absolute;
+    top: 0;
+    right: 30px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
 .title-mobile {
     display: none;
 }

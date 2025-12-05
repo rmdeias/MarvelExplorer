@@ -69,22 +69,30 @@
         {% endif %}
 
         {% if comic.characters is not empty %}
-        <article>
-            <h2>Characters</h2>
-            <div class="details-character-list">
-                {% for character in comic.characters %}
-                    <a class="details-character-card"
-                       href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
-                        <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
-                        <div class="card-infos">
-                            <p>{{ character.name }}</p>
-                        </div>
-                    </a>
-                {% endfor %}
-            </div>
-        </article>
+            <article>
+                <h2>Characters</h2>
+                <div class="details-character-list">
+                    {% for character in comic.characters %}
+                        <a class="details-character-card"
+                           href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
+                            <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
+                            <div class="card-infos">
+                                <p>{{ character.name }}</p>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </article>
         {% endif %}
+        <!-- Modal  -->
+        <div id="imageModal" class="modal">
+            <span class="close">&times;</span>
+            <img class="modal-content" id="modalImage">
+            <div id="caption"></div>
+        </div>
     </section>
+
+    <script src="{{ asset('assets/js/modalImgComics.js') }}"></script>
 
     <script src="{{ asset('assets/js/changeMainCoverForVariantCover.js') }}"></script>
 
