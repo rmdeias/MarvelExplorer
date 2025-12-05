@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block body %}
 
-    <div class="details">
+    <section class="details">
         <div class="details-main">
 
             <div class="details-image">
@@ -9,28 +9,29 @@
             </div>
 
             <div class="details-info">
-                <h1>{{ character.name }}</h1>
+                <h2>{{ character.name }}</h2>
                 <p class="description">{{ character.description }}</p>
             </div>
         </div>
 
         {% if character.series is not empty %}
-
-            <h2>Series</h2>
-            <div class="details-serie-list">
-                {% for serie in character.series %}
-                    <a class="details-serie-card"
-                       href="/series/{{ serie.marvelId }}-{{ serie.title |slug|lower }}">
-                        <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}"
-                             alt="{{ serie.title }}">
-                        <div class="card-infos">
-                            <h3>{{ serie.title }}</h3>
-                        </div>
-                    </a>
-                {% endfor %}
-            </div>
+            <article>
+                <h2>Series</h2>
+                <div class="details-serie-list">
+                    {% for serie in character.series %}
+                        <a class="details-serie-card"
+                           href="/series/{{ serie.marvelId }}-{{ serie.title |slug|lower }}">
+                            <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}"
+                                 alt="{{ serie.title }}">
+                            <div class="card-infos">
+                                <h3>{{ serie.title }}</h3>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </article>
 
         {% endif %}
-    </div>
+    </section>
 
 {% endblock %}
