@@ -1,13 +1,16 @@
 {% extends 'base.html.twig' %}
 {% block body %}
 
-    <div class="details">
-        <div class="details-main">
-            <div class="details-info">
+    {% if seriesByCreator.series is not empty %}
 
-                <h1>{{ seriesByCreator.creator }} worked on : </h1>
-                <div class="details-serie-list">
-                    {% if seriesByCreator.series is not empty %}
+        <div class="details">
+            <div class="details-main">
+                <div class="details-info">
+
+                    <h1>{{ seriesByCreator.creator }} worked on : </h1>
+
+                    <div class="details-serie-list">
+
                         {% for serie in seriesByCreator.series %}
 
                             <div class="details-serie-card">
@@ -20,11 +23,19 @@
                             </div>
 
                         {% endfor %}
-                    {% endif %}
-                </div>
 
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+
+    {% else %}
+
+        {% include '_bad_research.html.twig' %}
+
+    {% endif %}
+
+
+
 
 {% endblock %}
