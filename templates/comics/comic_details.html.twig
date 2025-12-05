@@ -2,64 +2,74 @@
 
 {% block body %}
 
-    <div class="details">
+    <section class="details">
         <div class="details-main">
+
+            <h2 class="title-mobile">{{ comic.title }}</h2>
             <!-- Image principale -->
             <div class="details-image">
-                <img id ="main-cover" src="{{ comic.thumbnail?: asset('assets/images/no-img.jpg')}}" alt="{{ comic.title }}">
+                <img id="main-cover" src="{{ comic.thumbnail?: asset('assets/images/no-img.jpg') }}"
+                     alt="{{ comic.title }}">
+                <div class="pages-dates">
+                    {% if comic.pageCount > 0 %}
+                        <p>pages: {{ comic.pageCount }}</p>
+                    {% endif %}
+                    <p>date: {{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
+                </div>
             </div>
 
             <!-- Infos du comic -->
-            <div class="details-info">
-                <h1>{{ comic.title }}</h1>
-                <p class="description">{{ comic.description }}</p>
+            <article class="details-info details-info-reverse">
+                <h2 class="title-desktop">{{ comic.title }}</h2>
+                <div>
+                    <p class="description">{{ comic.description }}</p>
 
-                {% if comic.pageCount > 0 %}
-                    <p>pages: {{ comic.pageCount }}</p>
-                {% endif %}
-                <p>date: {{ comic.date is defined and comic.date ? comic.date|date("Y-m-d") : 'unknown date' }}</p>
-
-                {% if comic.creators is not empty and  comic.creators|length > 0 %}
-                    <ul class="details-creators">
-                        {% for creator in comic.creators %}
-                            <li>
-                                <span class="role">{{ creator.role|capitalize }} </span>
-                                <a href="/creators/{{ creator.marvelId }}-{{ creator.fullName|slug|lower }}">: {{ creator.fullName }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
+                    {% if comic.creators is not empty and  comic.creators|length > 0 %}
+                        <ul class="details-creators">
+                            {% for creator in comic.creators %}
+                                <li>
+                                    <span class="role">{{ creator.role|capitalize }} </span>
+                                    <a href="/creators/{{ creator.marvelId }}-{{ creator.fullName|slug|lower }}">: {{ creator.fullName }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
                 {% if comic.variants is not empty %}
-                    <h2>Variants cover</h2>
-                    <div class="variant-list">
-                        {% for variant in comic.variants %}
-                            <div class="variant-card" data-cover="{{ variant.thumbnail }}">
-                                <img class="variant-cover" src="{{ variant.thumbnail }}" alt="{{ variant.title }}">
-                                <p>{{ variant.title }}</p>
-                            </div>
-                        {% endfor %}
+                    <div>
+                        <h2>Variants cover</h2>
+                        <div class="variant-list">
+                            {% for variant in comic.variants %}
+                                <div class="variant-card" data-cover="{{ variant.thumbnail }}">
+                                    <img class="variant-cover" src="{{ variant.thumbnail }}"
+                                         alt="{{ variant.title }}">
+                                    <p>{{ variant.title }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 {% endif %}
-            </div>
-
+            </article>
         </div>
 
         {% if comic.serie is not empty %}
-            <h2>Serie</h2>
-            <div class="details-serie-list">
-                <a class="details-serie-card"
-                   href="/series/{{ comic.serie.marvelId }}-{{ comic.serie.title |slug|lower }}">
-                    <img src="{{ comic.serie.thumbnail ?: asset('assets/images/no-img.jpg') }}"
-                         alt="{{ comic.serie.title }}">
-                    <div class="card-infos">
-                        <h3>{{ comic.serie.title }}</h3>
-                    </div>
-                </a>
-            </div>
+            <article>
+                <h2>Serie</h2>
+                <article class="details-serie-list">
+                    <a class="details-serie-card"
+                       href="/series/{{ comic.serie.marvelId }}-{{ comic.serie.title |slug|lower }}">
+                        <img src="{{ comic.serie.thumbnail ?: asset('assets/images/no-img.jpg') }}"
+                             alt="{{ comic.serie.title }}">
+                        <div class="card-infos">
+                            <p>{{ comic.serie.title }}</p>
+                        </div>
+                    </a>
+                </article>
+            </article>
         {% endif %}
 
         {% if comic.characters is not empty %}
+        <article>
             <h2>Characters</h2>
             <div class="details-character-list">
                 {% for character in comic.characters %}
@@ -72,11 +82,10 @@
                     </a>
                 {% endfor %}
             </div>
+        </article>
         {% endif %}
-    </div>
+    </section>
 
     <script src="{{ asset('assets/js/changeMainCoverForVariantCover.js') }}"></script>
-
-
 
 {% endblock %}

@@ -2,81 +2,82 @@
 
 {% block body %}
 
-    <div class="details">
+    <section class="details">
         <div class="details-main">
 
             <div class="details-image">
                 <img src="{{ serie.thumbnail ?: asset('assets/images/no-img.jpg') }}" alt="{{ serie.title }}">
             </div>
 
-            <div class="details-info">
-                <h1>{{ serie.title }}</h1>
-                <p class="description">{{ serie.description }}</p>
-                <p>Start year: {{ serie.startYear }}</p>
-                <p>End year: {{ serie.endYear }}</p>
+            <article class="details-info">
+                <h2>{{ serie.title }}</h2>
+                <div>
+                    <p class="description">{{ serie.description }}</p>
+                    <div class="pages-dates">
+                        <p>Start year: {{ serie.startYear }}</p>
+                        <p>End year: {{ serie.endYear }}</p>
+                    </div>
 
-                {% if serie.creators is not empty %}
+                    {% if serie.creators is not empty %}
 
-                    <ul class="details-creators">
-                        {% for creator in serie.creators %}
+                        <ul class="details-creators">
+                            {% for creator in serie.creators %}
 
-                            <li>
-                                <span class="role">{{ creator.role|capitalize }}</span>
-                                <a href="/creators/{{ creator.marvelId }}-{{ creator.fullName|slug|lower }}">
-                                    : {{ creator.fullName }}</a>
-                            </li>
+                                <li>
+                                    <span class="role">{{ creator.role|capitalize }}</span>
+                                    <a href="/creators/{{ creator.marvelId }}-{{ creator.fullName|slug|lower }}">
+                                        : {{ creator.fullName }}</a>
+                                </li>
 
-                        {% endfor %}
-                    </ul>
+                            {% endfor %}
+                        </ul>
 
-                {% endif %}
-            </div>
+                    {% endif %}
+                </div>
+            </article>
         </div>
 
         {% if serie.comics is not empty %}
+            <article>
+                <h2>Comics</h2>
+                <div class="details-comic-list">
+                    {% for comic in serie.comics %}
+                        {% if  'variant' not in comic.title|lower %}
 
-            <h2>Comics</h2>
-            <div class="details-comic-list">
-                {% for comic in serie.comics %}
-                    {% if  'variant' not in comic.title|lower %}
-
-                        <div class="details-comic-card">
-                            <a href="/comics/{{ comic.marvelId }}-{{ comic.title|slug|lower }}">
-                                <img src="{{ comic.thumbnail ?: asset('assets/images/no-img.jpg') }}"
-                                     alt="{{ comic.title }}"></a>
-                            <div class="card-infos">
-                            <p>{{ comic.title }}</p>
+                            <div class="details-comic-card">
+                                <a href="/comics/{{ comic.marvelId }}-{{ comic.title|slug|lower }}">
+                                    <img src="{{ comic.thumbnail ?: asset('assets/images/no-img.jpg') }}"
+                                         alt="{{ comic.title }}"></a>
+                                <div class="card-infos">
+                                    <p>{{ comic.title }}</p>
+                                </div>
                             </div>
-                        </div>
 
-                    {% endif %}
-                {% endfor %}
-            </div>
-
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </article>
         {% endif %}
 
         {% if serie.characters is not empty %}
+            <article>
+                <h2>Characters</h2>
+                <div class="details-character-list">
+                    {% for character in serie.characters %}
 
-            <h2>Characters</h2>
-            <div class="details-character-list">
-                {% for character in serie.characters %}
+                        <div class="details-character-card">
+                            <a href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
+                                <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
+                                <div class="card-infos">
+                                    <p>{{ character.name }}</p>
+                                </div>
+                            </a>
+                        </div>
 
-                    <div class="details-character-card">
-                        <a href="/characters/{{ character.marvelId }}-{{ character.name |slug|lower }}">
-                            <img src="{{ character.thumbnail }}" alt="{{ character.name }}">
-                            <div class="card-infos">
-                                <p>{{ character.name }}</p>
-                            </div>
-                        </a>
-                    </div>
-
-                {% endfor %}
-            </div>
-
+                    {% endfor %}
+                </div>
+            </article>
         {% endif %}
-
-    </div>
-
-
+    </section>
 
 {% endblock %}

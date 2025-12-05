@@ -58,6 +58,7 @@ a {
    Headings
 ========================== */
 h1 {
+    margin: 2rem 0 1rem;
     text-align: center;
     text-transform: uppercase;
     color: #fff;
@@ -65,9 +66,10 @@ h1 {
     text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.7);
 }
 
-h1, h2 {
-    margin: 2rem 0 1rem;
+h2, h1 {
+    padding: 10px;
 }
+
 
 /* ==========================
    Grids (Comics / Series / Characters)
@@ -145,9 +147,8 @@ h1, h2 {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.7);
     color: #fff;
-    padding: 2px;
     font-weight: bold;
     font-size: 14px;
     text-align: center;
@@ -171,10 +172,14 @@ h1, h2 {
 /* ==========================
    Details Pages
 ========================== */
+.title-mobile {
+    display: none;
+}
+
 .details {
     max-width: 1200px;
-    margin: 15px auto;
-    padding: 20px;
+    margin: 0 auto;
+    padding: 10px;
     background: rgba(0, 0, 0, 0.8);
     border-radius: 8px;
     color: #fff;
@@ -202,6 +207,14 @@ h1, h2 {
     font-weight: bolder;
 }
 
+.pages-dates {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin: 10px 0;
+}
+
+
 .details-creators {
     display: flex;
     flex-wrap: wrap;
@@ -211,15 +224,18 @@ h1, h2 {
     margin: 0.5rem 0 1rem;
 }
 
-.details-creators li {
-    display: flex;
-    align-items: center;
+.details-creators li, .pages-dates p {
     background: #111;
     border: 1px solid #333;
     padding: 6px 10px;
     border-radius: 6px;
     font-size: 0.9rem;
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+.details-creators li {
+    display: flex;
+    align-items: center;
     white-space: nowrap;
 }
 
@@ -411,16 +427,55 @@ h1, h2 {
 }
 
 @media (max-width: 768px) {
+
+    .cover-card {
+        height: 245px;
+    }
+
+    .card-infos {
+        font-size: 12px;
+    }
+
     .details-main {
         flex-direction: column;
         align-items: center;
+    }
+
+    .details-info-reverse {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    .details-image img {
+        width: 100%;
+    }
+
+    .title-mobile {
+        display: block;
+    }
+
+    .title-desktop {
+        display: none;
     }
 
     .variant-list, .details-character-list, .comic-list, .serie-list, .character-list, .details-comic-list, .details-serie-list {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    .variant-list {
+        margin: 10px 0;
+    }
+
     .next-button, .previous-button {
         display: none;
     }
+
+    .character-card, .details-character-card {
+        height: 155px;
+    }
+
 }
+
+
+
+
