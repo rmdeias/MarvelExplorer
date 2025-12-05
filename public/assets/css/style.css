@@ -158,7 +158,7 @@ h2, h1 {
 
 .cover-card img, .character-card img, .details-serie-card img {
     width: 100%;
-    min-height: -webkit-fill-available;
+    height: inherit;
 }
 
 .cover-card:hover .card-infos, .character-card:hover .card-infos,
