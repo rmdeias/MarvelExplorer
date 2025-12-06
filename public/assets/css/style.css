@@ -105,7 +105,8 @@ h2, h1 {
 }
 
 .character-card, .details-character-card {
-    height: 280px;
+    height: 260px;
+    width: 260px;
 }
 
 .cover-card:hover, .character-card:hover,
@@ -156,16 +157,16 @@ h2, h1 {
     margin: 0;
 }
 
-.cover-card img, .character-card img, .details-serie-card img {
+.cover-card img, .details-serie-card img {
     width: 100%;
     height: inherit;
 }
+
 
 .cover-card:hover .card-infos, .character-card:hover .card-infos,
 .details-serie-card:hover .card-infos, .details-character-card:hover .card-infos, .details-comic-card:hover .card-infos {
     background: rgba(0, 0, 0, 0.95);
 }
-
 
 
 /* ==========================
@@ -186,7 +187,7 @@ h2, h1 {
     display: block;
     max-width: 500px;
     padding: 10px;
-    background:rgba(255, 255, 255, 0.1) ;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 #caption {
@@ -210,7 +211,7 @@ h2, h1 {
 
 /******************************/
 
-#main-cover , .variant-list {
+#main-cover, .variant-list {
     cursor: pointer;
 }
 
@@ -303,6 +304,8 @@ h2, h1 {
     gap: 1rem;
     margin-top: 1rem;
     text-align: center;
+    justify-items: center;
+    align-items: center;
 }
 
 .variant-card, .details-info .description {
@@ -328,6 +331,10 @@ h2, h1 {
 .variant-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+}
+
+.details-serie-card {
+    height: 380px;
 }
 
 /* ==========================
@@ -456,6 +463,11 @@ h2, h1 {
     .variant-list, .details-character-list, .comic-list, .serie-list, .character-list, .details-comic-list, .details-serie-list {
         grid-template-columns: repeat(4, 1fr);
     }
+
+    .character-card, .details-character-card {
+        height: 200px;
+        width: 200px;
+    }
 }
 
 @media (max-width: 992px) {
@@ -465,6 +477,15 @@ h2, h1 {
 
     .pagination-creators {
         display: none;
+    }
+
+    .character-card, .details-character-card {
+        height: 230px;
+        width: 230px;
+    }
+
+    .details-serie-card {
+        height: 360px;
     }
 }
 
@@ -502,6 +523,7 @@ h2, h1 {
 
     .variant-list, .details-character-list, .comic-list, .serie-list, .character-list, .details-comic-list, .details-serie-list {
         grid-template-columns: repeat(2, 1fr);
+
     }
 
     .variant-list {
@@ -513,7 +535,12 @@ h2, h1 {
     }
 
     .character-card, .details-character-card {
-        height: 155px;
+        height: 160px;
+        width: 160px;
+    }
+
+    .details-serie-card {
+        height: 251px;
     }
 
 }
